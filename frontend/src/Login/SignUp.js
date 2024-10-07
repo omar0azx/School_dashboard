@@ -10,7 +10,7 @@ import school from "../assets/ri--school-line.svg";
 
 const SignUp = () => {
   return (
-    <div className="flex h-screen" style={{ backgroundColor: "#F0FEFF" }}>
+    <div className="flex h-screen bg-cyan-100">
       {/* <BorderBeam /> */}
       {/* Left Side */}
       <SignUpContent />
@@ -49,7 +49,7 @@ const SignUpContent = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
   return (
-    <div className="w-1/2 bg-white flex justify-center items-center">
+    <div className="w-1/2 bg-gradient-to-l from-cyan-50 to-blue-50 flex justify-center items-center">
       <div className="w-1/2flex flex-col items-center p-4">
         <h1 className="text-3xl font-medium mb-8">إنشاء حساب</h1>
         <form className="w-full max-w-sm">
@@ -60,9 +60,9 @@ const SignUpContent = () => {
               id="name"
               // value={email}
               // onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded-2xl w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline focus:shadow-outline"
               placeholder="الإسم الكامل"
-              style={{ backgroundColor: "#e2f9ff" }}
+              style={{ backgroundColor: "#9d9d9d12" }}
               dir="rtl" // Set direction to right-to-left
             />
             <img
@@ -78,9 +78,9 @@ const SignUpContent = () => {
               id="email"
               // value={email}
               // onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded-2xl w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline focus:shadow-outline"
               placeholder="البريد الالكتروني"
-              style={{ backgroundColor: "#e2f9ff" }}
+              style={{ backgroundColor: "#9d9d9d12" }}
               dir="rtl" // Set direction to right-to-left
             />
             <img
@@ -95,9 +95,9 @@ const SignUpContent = () => {
             <input
               type={showPassword ? "text" : "password"}
               id="password"
-              className="shadow appearance-none border rounded w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded-2xl w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline focus:shadow-outline"
               placeholder="كلمة المرور"
-              style={{ backgroundColor: "#e2f9ff" }}
+              style={{ backgroundColor: "#9d9d9d12" }}
               dir="rtl"
             />
             <img
@@ -120,9 +120,9 @@ const SignUpContent = () => {
               id="confirm-password"
               // value={confirmPassword}
               // onChange={(e) => setConfirmPassword(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded-2xl w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline focus:shadow-outline"
               placeholder="تأكيد كلمة المرور"
-              style={{ backgroundColor: "#e2f9ff" }}
+              style={{ backgroundColor: "#9d9d9d12" }}
               dir="rtl" // Set direction to right-to-left
             />
             <img
@@ -145,9 +145,9 @@ const SignUpContent = () => {
               id="School"
               // value={email}
               // onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded-2xl w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline focus:shadow-outline"
               placeholder="رمز المدرسة"
-              style={{ backgroundColor: "#e2f9ff" }}
+              style={{ backgroundColor: "#9d9d9d12" }}
               dir="rtl" // Set direction to right-to-left
             />
             <img
@@ -161,7 +161,7 @@ const SignUpContent = () => {
           <div className="flex items-center justify-center mt-14">
             <button
               type="submit"
-              className=" bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded"
+              className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded"
               style={{
                 borderRadius: "15px",
                 transition: "all 0.1s ease-in-out",

@@ -27,19 +27,19 @@ const Login = () => {
   };
 
   return (
-    <div className="w-1/2 bg-white flex justify-center items-center">
+    <div className="w-1/2 bg-gradient-to-l from-cyan-50 to-blue-50 flex justify-center items-center">
       <div
         className="w-1/2 flex flex-col items-center p-4"
         // style={{ backgroundColor: "#F0FEFF" }}
       >
         <h1
-          className="text-3xl font-medium mb-5"
+          className="text-4xl font-medium mb-5"
           style={{ filter: "drop-shadow( 12px 7px 8px rgba(0, 0, 0, 0.10))" }}
         >
           تسجيل الدخول
         </h1>
         <h2
-          className="text-3l font-medium mb-7 "
+          className="text-xl font-medium mb-7 "
           style={{ filter: "drop-shadow( 12px 7px 8px rgba(0, 0, 0, 0.10))" }}
         >
           {" "}
@@ -53,9 +53,9 @@ const Login = () => {
               id="username"
               // value={username}
               // onChange={(e) => setUsername(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded-2xl w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline focus:shadow-outline"
               placeholder="البريد الالكتروني"
-              style={{ backgroundColor: "#e2f9ff" }}
+              style={{ backgroundColor: "#9d9d9d12" }}
               dir="rtl" // Set direction to right-to-left
             />
             <img
@@ -72,9 +72,9 @@ const Login = () => {
               id="password"
               // value={password}
               // onChange={(e) => setPassword(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded-2xl w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline focus:shadow-outline"
               placeholder="كلمة المرور"
-              style={{ backgroundColor: "#e2f9ff" }}
+              style={{ backgroundColor: "#9d9d9d12" }}
               dir="rtl" // Set direction to right-to-left
             />
             <img
@@ -91,10 +91,10 @@ const Login = () => {
           </div>
 
           {/* Forgot Password Link */}
-          <div className="mb-4">
+          <div className="mb-4 text-left">
             <a
               href="/forgot-password"
-              className="block text-left text-[#747272] text-sm"
+              className="text-left text-[#747272] text-sm hover:underline"
             >
               هل نسيت كلمة المرور؟
             </a>
@@ -104,7 +104,7 @@ const Login = () => {
           <div className="flex items-center justify-center mt-14">
             <button
               type="submit"
-              className=" bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded"
+              className=" shadow-lg shadow-cyan-500/50  bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded"
               style={{
                 borderRadius: "15px",
                 transition: "all 0.1s ease-in-out",

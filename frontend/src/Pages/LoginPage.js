@@ -36,7 +36,7 @@ import LogoSchool from "../assets/G123.svg";
 
 function LoginPage() {
   return (
-    <div className="flex h-screen" style={{ backgroundColor: "#F0FEFF" }}>
+    <div className="flex h-screen bg-cyan-100">
       {/* Left Side */}
       <Login />
       {/* <SignUp /> */}
