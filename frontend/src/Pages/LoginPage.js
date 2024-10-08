@@ -1,9 +1,7 @@
 // import React, { useState } from "react";
 import Login from "../Login/Login.js";
-import SignUp from "../Login/SignUp.js";
+// import SignUp from "../Login/SignUp.js";
 import blueBackground from "../assets/Group_222.svg";
-import lockIcon from "../assets/lock.svg";
-import broIcon from "../assets/bro.svg";
 import LogoSchool from "../assets/G123.svg";
 
 // import DawaiWhite from "../assets/DawaiWhite.svg";

@@ -16,15 +16,15 @@ const Login = () => {
   };
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
+  // const toggleConfirmPasswordVisibility = () => {
+  //   setShowConfirmPassword(!showConfirmPassword);
+  // };
 
   return (
     <div className="w-1/2 bg-gradient-to-l from-cyan-50 to-blue-50 flex justify-center items-center">
@@ -116,7 +116,7 @@ const Login = () => {
 
           {/* Sign Up Link */}
           <div className="text-center mt-4">
-            <a href="/SignUp" className="underline text-[#747272] text-sm">
+            <a href="/SignUpPage" className="underline text-[#747272] text-sm">
               لاتملك حساب ؟ <span className="text-[#3BCAD3]">انشئ حساب</span>
             </a>
           </div>

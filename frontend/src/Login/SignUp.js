@@ -39,15 +39,15 @@ const SignUp = () => {
 
 const SignUpContent = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
+  // const toggleConfirmPasswordVisibility = () => {
+  //   setShowConfirmPassword(!showConfirmPassword);
+  // };
   return (
     <div className="w-1/2 bg-gradient-to-l from-cyan-50 to-blue-50 flex justify-center items-center">
       <div className="w-1/2flex flex-col items-center p-4">
@@ -173,7 +173,7 @@ const SignUpContent = () => {
 
           {/* Already Have Account Link */}
           <div className="text-center mt-4">
-            <a href="/login" className="underline text-[#747272] text-sm">
+            <a href="/loginPage" className="underline text-[#747272] text-sm">
               تملك حساب بالفعل ؟{" "}
               <span className="text-[#3BCAD3]">تسجيل الدخول</span>
             </a>
