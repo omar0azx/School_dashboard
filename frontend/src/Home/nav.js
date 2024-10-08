@@ -17,7 +17,7 @@ const Nav = () => {
   };
 
   return (
-    <nav className="grid grid-cols-3 items-center h-24 bg-white shadow-md px-8">
+    <nav className="grid grid-cols-3 items-center h-20 bg-white shadow-md px-6">
       <div className="flex justify-start">
         <span className="text-[25px] font-semibold text-black font-cairo">
           لوحة القيادة
@@ -58,8 +58,8 @@ const Nav = () => {
         </svg>
 
         <button onClick={toggleDropdown} className="focus:outline-none">
-          <h3 className="text-[25px] font-semibold text-black font-cairo">
-            أهلًا أ.عامر
+          <h3 className="text-[18px] font-semibold text-black font-cairo">
+            أهلًا أ.نواف,
           </h3>
         </button>
 
