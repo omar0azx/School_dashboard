@@ -1,12 +1,47 @@
-import headerLogo from "../assets/Group_477.svg";
+import { useNavigate, useLocation } from "react-router-dom";
+import headerLogo from "../assets/logo_school_text.svg";
 import signoutlogo from "../assets/Exit.svg";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+
+// Helper function for SweetAlert and navigation
+export const showSignOutAlert = (navigate) => {
+  Swal.fire({
+    title: "هل أنت متأكد؟",
+    text: ".سوف يتم تحويلك الى صفحة الدخول",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "نعم",
+    cancelButtonText: "إلغاء",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        text: ".سيتم تحويلك الى صفحة تسجيل الدخول",
+        icon: "success",
+        confirmButtonText: "حسنََا",
+      }).then(() => {
+        navigate("/loginPage");
+      });
+    }
+  });
+};
 
 const SideNav = () => {
+  const navigate = useNavigate();
+  const location = useLocation(); // Get the current path
+
+  const handleSignOut = () => {
+    // Call the SweetAlert and navigation function
+    showSignOutAlert(navigate);
+  };
+  // Conditionally apply hover and text styles based on the current location
+  const isActive = (path) => location.pathname === path;
   return (
     <div className="fixed top-0 right-0 w-60 h-full bg-white shadow-lg rounded-l-lg z-50 p-4 flex flex-col justify-between 2k:w-[19rem] 2k:text-[20px] fullhd:w-[19rem] fullhd:text-[20px]">
       <div>
-        <div className="mb-10 mt-10">
+        <div className="mb-10 mt-3">
           <img src={headerLogo} alt="Logo" className="mx-auto w-44 h-24" />
         </div>
 
@@ -14,9 +49,19 @@ const SideNav = () => {
           {/* {لوحة القيادة} */}
           <li>
             <Link to="/HomePage" className="font-cairo font-medium">
-              <button className="w-full flex items-center justify-start px-4 h-14 rounded-[15px] hover:bg-[#3bc9d327] text-[#6A6A6A] hover:text-[#3BCAD3] group">
+              <button
+                className={`w-full flex items-center justify-start px-4 h-14 rounded-[15px] ${
+                  isActive("/HomePage")
+                    ? "bg-[#3bc9d327] text-[#3BCAD3]"
+                    : "hover:bg-[#3bc9d327] text-[#6A6A6A] hover:text-[#3BCAD3]"
+                } group`}
+              >
                 <svg
-                  className=" ml-7 mr-3 fill-[#6A6A6A] group-hover:fill-[#3BCAD3]"
+                  className={`ml-7 mr-3 ${
+                    isActive("/HomePage")
+                      ? "fill-[#3BCAD3]"
+                      : "fill-[#6A6A6A] group-hover:fill-[#3BCAD3]"
+                  }`}
                   width="24"
                   height="24"
                   viewBox="0 0 44 40"
@@ -95,17 +140,18 @@ const SideNav = () => {
 
       {/* {الخروج} */}
       <div className="mb-4">
-        <Link to="/loginPage" className="font-cairo font-medium">
-          <button className="w-full flex items-center justify-start px-4 h-14 rounded-[15px] text-[#6A6A6A] hover:bg-[#FFEBEB] hover:text-[#6A6A6A] group">
-            <img
-              src={signoutlogo}
-              alt="Icon 4"
-              className="ml-4 mr-5 w-6 h-6 transition-colors duration-200"
-            />
-            الخروج
-            {/* <p className="font-cairo font-medium">تسجيل الخروج</p> */}
-          </button>
-        </Link>
+        <button
+          onClick={handleSignOut}
+          className="w-full flex items-center justify-start px-4 h-14 rounded-[15px] text-[#6A6A6A] hover:bg-[#FFEBEB] hover:text-[#6A6A6A] group font-cairo font-medium"
+        >
+          <img
+            src={signoutlogo}
+            alt="Icon 4"
+            className="ml-6 mr-4 w-6 h-6 transition-colors duration-200"
+          />
+          الخروج
+          {/* <p className="font-cairo font-medium">تسجيل الخروج</p> */}
+        </button>
       </div>
     </div>
   );
