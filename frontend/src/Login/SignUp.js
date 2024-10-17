@@ -1,17 +1,16 @@
 import React, { useState } from "react";
-import LogoSchool from "../assets/G123.svg";
-import blueBackground from "../assets/Group_222.svg";
-import broIcon from "../assets/bro.svg";
-import lockIcon from "../assets/lock.svg";
-import emailIcon from "../assets/email_icon.svg";
-import showPasswordIcon from "../assets/closed_eye.svg";
-import hidePasswordIcon from "../assets/opened_eye.svg";
-import school from "../assets/ri--school-line.svg";
+import LogoSchool from "../assets/logo_Tatawei.svg";
+import blueBackground from "../assets/blueBackground.svg";
+import broIcon from "../assets/icon_bro.svg";
+import lockIcon from "../assets/icon_lock.svg";
+import emailIcon from "../assets/icon_email.svg";
+import showPasswordIcon from "../assets/eye_closed.svg";
+import hidePasswordIcon from "../assets/eye_opened.svg";
+import school from "../assets/icon_school.svg";
 
 const SignUp = () => {
   return (
     <div className="flex h-screen bg-cyan-100">
-      {/* <BorderBeam /> */}
       {/* Left Side */}
       <SignUpContent />
       {/* Right Side */}
