@@ -48,6 +48,7 @@ import { Link } from "react-router-dom";
 // import { getOrderStatus } from "../lib/helpers";
 import { useState } from "react";
 import Cards from "./cards.js";
+import maleIcon from "../assets/avatar_male.svg";
 
 const Table = () => {
   // State to track which header is clicked
@@ -58,7 +59,7 @@ const Table = () => {
     setActiveHeader(headerName);
   };
   return (
-    <div className="my-4 2k:w-[95%] fullhd:w-[95%]">
+    <div className="my-3 2k:w-[95%] fullhd:w-[95%]">
       <div className="flex justify-center items-center gap-5">
         {/* Clickable h3 Tags */}
         <h2
@@ -88,10 +89,13 @@ const Table = () => {
       <Cards />
 
       {activeHeader === "inbox" && (
-        <div className="flex mt-2 justify-between">
+        <div className="flex mt-1 justify-between">
           <h2 className="text-[20px] font-semibold font-cairo text-right pr-5">
             التحقق من توثيق الساعات الجديدة للطلاب:
           </h2>
+          <button className="ml-7 shadow-lg shadow-[#23232355]  bg-[#232323] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl">
+            تنزيل ملف الاكسل
+          </button>
         </div>
       )}
       {activeHeader === "reports" && (
@@ -117,6 +121,7 @@ function ReportsTable() {
 
   // Table headers
   const headers = [
+    "",
     "اسم الطالب",
     "المستوى",
     "الساعات الجديدة",
@@ -129,10 +134,10 @@ function ReportsTable() {
   const rows = [
     ["محمد أحمد", "الثالث", "10", "20", "10/10/2021"],
     ["أحمد علي", "الثاني", "8", "18", "11/11/2021"],
-    ["سارة محمد", "الرابع", "12", "24", "12/12/2021"],
+    ["سعيد محمد", "الرابع", "12", "24", "12/12/2021"],
     ["علي سعيد", "الأول", "6", "14", "01/01/2022"],
     ["خالد سالم", "الثالث", "11", "22", "02/02/2022"],
-    ["فاطمة حسن", "الثاني", "9", "19", "03/03/2022"],
+    ["نواف حسن", "الثاني", "9", "19", "03/03/2022"],
   ];
 
   // Function to handle the click event for a specific row
@@ -161,26 +166,24 @@ function ReportsTable() {
           <tbody>
             {rows.map((row, rowIndex) => (
               <tr className="bg-white text-[#232323] border-b" key={rowIndex}>
+                <td className="py-3">
+                  <img src={maleIcon} alt="male student icon" />
+                </td>
                 {row.map((cell, cellIndex) => (
-                  <td className="px-4 py-3" key={cellIndex}>
+                  <td className="px-3 py-3" key={cellIndex}>
                     {cell}
                   </td>
                 ))}
                 <td className="px-4 py-3 flex justify-center items-center">
-                  <svg
-                    onClick={() => handleClick(rowIndex)} // Pass the row index
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill={checkboxStates[rowIndex] ? "green" : "white"}
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke={checkboxStates[rowIndex] ? "white" : "#c2c2c2"} // Change stroke color based on state
-                    className="size-8 cursor-pointer transition-all duration-300 ease-in-out hover:scale-110"
+                  <button
+                    className="shadow-lg shadow-[#23232355] bg-[#23232372] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl"
+                    style={{
+                      borderRadius: "15px",
+                      transition: "all 0.1s ease-in-out",
+                    }}
                   >
-                    <path
-                      d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                    تنزيل
+                  </button>
                 </td>
               </tr>
             ))}
@@ -200,6 +203,7 @@ function MainTable() {
 
   // Table headers
   const headers = [
+    "",
     "اسم الطالب",
     "المستوى",
     "الساعات الجديدة",
@@ -244,6 +248,9 @@ function MainTable() {
           <tbody>
             {rows.map((row, rowIndex) => (
               <tr className="bg-white text-[#232323] border-b" key={rowIndex}>
+                <td className="py-3">
+                  <img src={maleIcon} alt="male student icon" />
+                </td>
                 {row.map((cell, cellIndex) => (
                   <td className="px-4 py-3" key={cellIndex}>
                     {cell}

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import broIcon from "../assets/bro.svg";
-import lockIcon from "../assets/lock.svg";
-import showPasswordIcon from "../assets/closed_eye.svg";
-import hidePasswordIcon from "../assets/opened_eye.svg";
+import broIcon from "../assets/icon_bro.svg";
+import lockIcon from "../assets/icon_lock.svg";
+import showPasswordIcon from "../assets/eye_closed.svg";
+import hidePasswordIcon from "../assets/eye_opened.svg";
 
 const Login = () => {
   const navigate = useNavigate();

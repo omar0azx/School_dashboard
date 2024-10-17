@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-// import "@fontsource/cairo/400.css";
-// import "@fontsource/cairo/600.css";
-// import "@fontsource/cairo/700.css";
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { showSignOutAlert } from "../components/sideNav.js";
+import { useNavigate } from "react-router-dom";
 
 const Nav = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+  const dropdownRef = useRef(null); // Create a ref for the dropdown
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -13,8 +14,22 @@ const Nav = () => {
 
   const handleLogout = () => {
     // Perform any logout operations here
-    setDropdownOpen(false); // Close the dropdown
+    showSignOutAlert(navigate);
   };
+
+  // Close dropdown if clicking outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false); // Close the dropdown
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   return (
     <nav className="grid grid-cols-3 items-center h-20 bg-white shadow-md px-6">
@@ -57,14 +72,17 @@ const Nav = () => {
           />
         </svg>
 
-        <button onClick={toggleDropdown} className="focus:outline-none">
-          <h3 className="text-[18px] font-semibold text-black font-cairo">
+        <button onClick={toggleDropdown} className="focus:outline-none ">
+          <h3 className="text-[18px] font-semibold text-black font-cairo cursor-pointer transition-all duration-300 ease-in-out hover:scale-105">
             أهلًا أ.نواف,
           </h3>
         </button>
 
         {dropdownOpen && (
-          <div className="absolute top-full mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+          <div
+            ref={dropdownRef} // Attach the ref to the dropdown
+            className="absolute top-full mt-2 w-48 bg-white border border-gray-300 rounded shadow z-10"
+          >
             <Link
               to="/ProfilePage"
               onClick={() => setDropdownOpen(false)}
@@ -72,8 +90,8 @@ const Nav = () => {
             >
               معلومات شخصية
             </Link>
+            <hr />
             <Link
-              to="/LoginPage"
               onClick={handleLogout}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100 font-cairo text-[20px]"
             >
