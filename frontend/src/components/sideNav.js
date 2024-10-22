@@ -77,10 +77,20 @@ const SideNav = () => {
           </li>
           {/* {ادارة الطلاب} */}
           <li>
-            <Link to="/staffPage" className="font-cairo font-medium">
-              <button className="w-full flex items-center justify-start px-4 h-14 rounded-[15px] hover:bg-[#3bc9d327] text-[#6A6A6A] hover:text-[#3BCAD3] group">
+            <Link to="/StudentPage" className="font-cairo font-medium">
+              <button
+                className={`w-full flex items-center justify-start px-4 h-14 rounded-[15px] ${
+                  isActive("/StudentPage")
+                    ? "bg-[#3bc9d327] text-[#3BCAD3]"
+                    : "hover:bg-[#3bc9d327] text-[#6A6A6A] hover:text-[#3BCAD3]"
+                } group`}
+              >
                 <svg
-                  className=" ml-7 mr-2 fill-[#6A6A6A] group-hover:fill-[#3BCAD3]"
+                  className={`ml-7 mr-3 ${
+                    isActive("/StudentPage")
+                      ? "fill-[#3BCAD3]"
+                      : "fill-[#6A6A6A] group-hover:fill-[#3BCAD3]"
+                  }`}
                   width="30"
                   height="24"
                   viewBox="0 0 42 28"
