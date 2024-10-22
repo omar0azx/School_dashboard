@@ -152,7 +152,7 @@ function ReportsTable() {
     <div className="mt-4 mx-20 bg-white px-4 pt-3 pb-4 rounded-3xl border border-gray-200 flex-1">
       {/* <div className="border-x border-gray-200 rounded mt-3 bg-black p-5"> */}
       {/* Add a wrapper div with max-height and overflow-y-auto */}
-      <div className="max-h-64 overflow-y-auto">
+      <div className="max-h-64 lg:max-h-[75vh] overflow-y-auto">
         <table className="w-full text-[#718EBF] bg-white">
           <thead className="border-b-2 border-gray-300">
             <tr>
@@ -196,10 +196,82 @@ function ReportsTable() {
 }
 
 function MainTable() {
-  // State to manage the SVG color for each row (use an array)
-  const [checkboxStates, setCheckboxStates] = useState(
-    new Array(6).fill(false) // Assuming 6 rows, change as needed
-  );
+  // State to manage table rows, including checkbox states
+  const [rows, setRows] = useState([
+    {
+      name: "محمد أحمد",
+      level: "الثالث",
+      newHours: "10",
+      oldHours: "20",
+      date: "10/10/2021",
+      isChecked: false,
+    },
+    {
+      name: "أحمد علي",
+      level: "الثاني",
+      newHours: "8",
+      oldHours: "18",
+      date: "11/11/2021",
+      isChecked: false,
+    },
+    {
+      name: "سارة محمد",
+      level: "الرابع",
+      newHours: "12",
+      oldHours: "24",
+      date: "12/12/2021",
+      isChecked: false,
+    },
+    {
+      name: "علي سعيد",
+      level: "الأول",
+      newHours: "6",
+      oldHours: "14",
+      date: "01/01/2022",
+      isChecked: false,
+    },
+    {
+      name: "خالد سالم",
+      level: "الثالث",
+      newHours: "11",
+      oldHours: "22",
+      date: "02/02/2022",
+      isChecked: false,
+    },
+    {
+      name: "فاطمة حسن",
+      level: "الثاني",
+      newHours: "9",
+      oldHours: "19",
+      date: "03/03/2022",
+      isChecked: false,
+    },
+    {
+      name: "فاطمة حسن",
+      level: "الثاني",
+      newHours: "9",
+      oldHours: "19",
+      date: "03/03/2022",
+      isChecked: false,
+    },
+    {
+      name: "فاطمة حسن",
+      level: "الثاني",
+      newHours: "9",
+      oldHours: "19",
+      date: "03/03/2022",
+      isChecked: false,
+    },
+    {
+      name: "فاطمة حسن",
+      level: "الثاني",
+      newHours: "9",
+      oldHours: "19",
+      date: "03/03/2022",
+      isChecked: false,
+    },
+    // ... more rows
+  ]);
 
   // Table headers
   const headers = [
@@ -212,29 +284,29 @@ function MainTable() {
     "التحقق",
   ];
 
-  // Table data (each row corresponds to a student, matching the headers)
-  const rows = [
-    ["محمد أحمد", "الثالث", "10", "20", "10/10/2021"],
-    ["أحمد علي", "الثاني", "8", "18", "11/11/2021"],
-    ["سارة محمد", "الرابع", "12", "24", "12/12/2021"],
-    ["علي سعيد", "الأول", "6", "14", "01/01/2022"],
-    ["خالد سالم", "الثالث", "11", "22", "02/02/2022"],
-    ["فاطمة حسن", "الثاني", "9", "19", "03/03/2022"],
-  ];
-
   // Function to handle the click event for a specific row
   const handleClick = (index) => {
-    setCheckboxStates((prevState) => {
-      const newStates = [...prevState];
-      newStates[index] = !newStates[index]; // Toggle the state for the clicked checkbox
-      return newStates;
+    setRows((prevRows) => {
+      // Clone the rows to avoid mutating the state directly
+      const updatedRows = [...prevRows];
+
+      // Toggle the `isChecked` state for the clicked row
+      updatedRows[index] = {
+        ...updatedRows[index],
+        isChecked: !updatedRows[index].isChecked,
+      };
+
+      // Move the row to the bottom of the table
+      const [rowToMove] = updatedRows.splice(index, 1);
+      updatedRows.push(rowToMove);
+
+      return updatedRows; // Return the updated rows
     });
   };
+
   return (
     <div className="mt-4 mx-20 bg-white px-4 pt-3 pb-4 rounded-3xl border border-gray-200 flex-1">
-      {/* <div className="border-x border-gray-200 rounded mt-3 bg-black p-5"> */}
-      {/* Add a wrapper div with max-height and overflow-y-auto */}
-      <div className="max-h-64 overflow-y-auto">
+      <div className="max-h-64 lg:max-h-[75vh] overflow-y-auto">
         <table className="w-full text-[#718EBF] bg-white">
           <thead className="border-b-2 border-gray-300">
             <tr>
@@ -251,19 +323,19 @@ function MainTable() {
                 <td className="py-3">
                   <img src={maleIcon} alt="male student icon" />
                 </td>
-                {row.map((cell, cellIndex) => (
-                  <td className="px-4 py-3" key={cellIndex}>
-                    {cell}
-                  </td>
-                ))}
+                <td className="px-4 py-3">{row.name}</td>
+                <td className="px-4 py-3">{row.level}</td>
+                <td className="px-4 py-3">{row.newHours}</td>
+                <td className="px-4 py-3">{row.oldHours}</td>
+                <td className="px-4 py-3">{row.date}</td>
                 <td className="px-4 py-3 flex justify-center items-center">
                   <svg
-                    onClick={() => handleClick(rowIndex)} // Pass the row index
+                    onClick={() => handleClick(rowIndex)}
                     xmlns="http://www.w3.org/2000/svg"
-                    fill={checkboxStates[rowIndex] ? "green" : "white"}
+                    fill={row.isChecked ? "green" : "white"}
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
-                    stroke={checkboxStates[rowIndex] ? "white" : "#c2c2c2"} // Change stroke color based on state
+                    stroke={row.isChecked ? "white" : "#c2c2c2"}
                     className="size-8 cursor-pointer transition-all duration-300 ease-in-out hover:scale-110"
                   >
                     <path
@@ -277,7 +349,6 @@ function MainTable() {
           </tbody>
         </table>
       </div>
-      {/* </div> */}
     </div>
   );
 }
