@@ -51,7 +51,7 @@ const StudentsTable = () => {
   ];
 
   return (
-    <div className="my-10 mx-20 bg-white px-4 pt-3 pb-4 rounded-3xl border border-gray-200 flex-1">
+    <div className="my-5 mx-20 bg-white px-4 pt-3 pb-4 rounded-3xl border border-gray-200 flex-1">
       {/* <div className="border-x border-gray-200 rounded mt-3 bg-black p-5"> */}
       {/* Add a wrapper div with max-height and overflow-y-auto */}
       <div className="max-h-64 lg:max-h-[60vh] overflow-y-auto">
