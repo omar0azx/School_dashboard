@@ -14,7 +14,7 @@ const HomePage = () => {
       <div className="col-start-1 row-start-1 row-end-3 bg-black w-full">
         <SideNav></SideNav>
       </div>
-      <div className=" bg-[#F3F3F3]">
+      <div className="bg-[#F3F3F3] max-h-[100vh] overflow-y-auto">
         <TableLocal></TableLocal>
       </div>
     </section>

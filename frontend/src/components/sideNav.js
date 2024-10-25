@@ -145,24 +145,26 @@ const SideNav = () => {
               <p className="font-cairo font-medium">الاشعارات</p>
             </button>
           </li>
+          <li>
+            <div className="mt-24">
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center justify-start px-4 h-14 rounded-[15px] text-[#6A6A6A] hover:bg-[#FFEBEB] hover:text-[#6A6A6A] group font-cairo font-medium"
+              >
+                <img
+                  src={signoutlogo}
+                  alt="Icon 4"
+                  className="ml-6 mr-4 w-6 h-6 transition-colors duration-200"
+                />
+                الخروج
+                {/* <p className="font-cairo font-medium">تسجيل الخروج</p> */}
+              </button>
+            </div>
+          </li>
         </ul>
       </div>
 
       {/* {الخروج} */}
-      <div className="mb-14">
-        <button
-          onClick={handleSignOut}
-          className="w-full flex items-center justify-start px-4 h-14 rounded-[15px] text-[#6A6A6A] hover:bg-[#FFEBEB] hover:text-[#6A6A6A] group font-cairo font-medium"
-        >
-          <img
-            src={signoutlogo}
-            alt="Icon 4"
-            className="ml-6 mr-4 w-6 h-6 transition-colors duration-200"
-          />
-          الخروج
-          {/* <p className="font-cairo font-medium">تسجيل الخروج</p> */}
-        </button>
-      </div>
     </div>
   );
 };
