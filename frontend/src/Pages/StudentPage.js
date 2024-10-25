@@ -15,13 +15,15 @@ function StudentPage() {
         <div className="col-start-1 row-start-1 row-end-3 bg-black w-full">
           <StudentSideNav></StudentSideNav>
         </div>
-        <div className=" bg-[#F3F3F3]">
-          <div className="flex mt-6 mb-6 justify-between">
+        <div className="bg-[#F3F3F3] max-h-[100vh] overflow-y-auto">
+          <div className="flex mt-6 justify-between">
             <h2 className="text-[20px] font-semibold font-cairo text-right pr-5">
-              الطُلاب الجُدد المُسجلين في المنصة:{" "}
+              الطُلاب الجُدد المُسجلين في المنصة:
             </h2>
           </div>
-          <StudentsTable></StudentsTable>
+          <div className="">
+            <StudentsTable />
+          </div>
         </div>
       </section>
     </>
