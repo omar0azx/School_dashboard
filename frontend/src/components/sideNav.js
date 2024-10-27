@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 export const showSignOutAlert = (navigate) => {
   Swal.fire({
     title: "هل أنت متأكد؟",
-    text: ".سوف يتم تحويلك الى صفحة الدخول",
+    text: ".سوف يتم تحويلك الى صفحة تسجيل الدخول",
     icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#3085d6",

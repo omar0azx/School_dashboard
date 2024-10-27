@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { showSignOutAlert } from "../components/sideNav.js";
+import { Link, useLocation } from "react-router-dom";
+import { showSignOutAlert } from "./sideNav.js";
 import { useNavigate } from "react-router-dom";
 
 const Nav = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null); // Create a ref for the dropdown
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -35,7 +37,9 @@ const Nav = () => {
     <nav className="grid grid-cols-3 items-center h-20 bg-white shadow-md px-6">
       <div className="flex justify-start">
         <span className="text-[25px] font-semibold text-black font-cairo">
-          إدارة الطلاب
+          {isActive("/HomePage") && "لوحة القيادة"}
+          {isActive("/StudentPage") && "إدارة الطلاب"}
+          {isActive("/ProfilePage") && "الملف الشخصي"}
         </span>
       </div>
       <div className="flex justify-center relative w-full max-w-md">

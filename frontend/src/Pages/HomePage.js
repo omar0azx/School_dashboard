@@ -1,5 +1,5 @@
 import SideNav from "../components/sideNav.js";
-import Nav from "../Home/nav.js";
+import Nav from "../components/nav.js";
 import TableLocal from "../Home/Table.js";
 
 const HomePage = () => {
