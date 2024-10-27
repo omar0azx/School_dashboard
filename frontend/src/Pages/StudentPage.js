@@ -1,4 +1,4 @@
-import StudentNav from "../Student/StudentNav.js";
+import StudentNav from "../components/nav.js";
 import StudentsTable from "../Student/StudentsTable.js";
 import StudentSideNav from "../components/sideNav.js";
 
