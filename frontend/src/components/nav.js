@@ -40,6 +40,7 @@ const Nav = () => {
           {isActive("/HomePage") && "لوحة القيادة"}
           {isActive("/StudentPage") && "إدارة الطلاب"}
           {isActive("/ProfilePage") && "الملف الشخصي"}
+          {isActive("/SettingsPage") && "الإعدادات"}
         </span>
       </div>
       <div className="flex justify-center relative w-full max-w-md">
@@ -92,7 +93,7 @@ const Nav = () => {
               onClick={() => setDropdownOpen(false)}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100 font-cairo text-[20px]"
             >
-              معلومات شخصية
+              الملف الشخصي{" "}
             </Link>
             <hr />
             <Link
