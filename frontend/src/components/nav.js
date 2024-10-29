@@ -41,6 +41,7 @@ const Nav = () => {
           {isActive("/StudentPage") && "إدارة الطلاب"}
           {isActive("/ProfilePage") && "الملف الشخصي"}
           {isActive("/SettingsPage") && "الإعدادات"}
+          {isActive("/StudentDetails") && "السجل التطوعي للطالب"}
         </span>
       </div>
       <div className="flex justify-center relative w-full max-w-md">
