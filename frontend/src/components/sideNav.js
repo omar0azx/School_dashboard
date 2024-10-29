@@ -42,7 +42,9 @@ const SideNav = () => {
     <div className="top-0 right-0 w-65 h-full bg-white shadow-lg rounded-l-lg z-50 p-4 flex flex-col justify-between">
       <div>
         <div className="mb-10 mt-3">
-          <img src={headerLogo} alt="Logo" className="mx-auto w-44 h-24" />
+          <Link to="/HomePage">
+            <img src={headerLogo} alt="Logo" className="mx-auto w-44 h-24" />
+          </Link>{" "}
         </div>
 
         <ul className="space-y-4">

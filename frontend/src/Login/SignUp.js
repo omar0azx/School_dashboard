@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import LogoSchool from "../assets/logo_Tatawei.svg";
 import blueBackground from "../assets/blueBackground.svg";
 import broIcon from "../assets/icon_bro.svg";
@@ -172,10 +173,10 @@ const SignUpContent = () => {
 
           {/* Already Have Account Link */}
           <div className="text-center mt-4">
-            <a href="/loginPage" className="underline text-[#747272] text-sm">
+            <Link to="/loginPage" className="underline text-[#747272] text-sm">
               تملك حساب بالفعل ؟{" "}
               <span className="text-[#3BCAD3]">تسجيل الدخول</span>
-            </a>
+            </Link>
           </div>
         </form>
         {/* Right Side */}
