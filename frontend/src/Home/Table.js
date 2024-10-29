@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import Cards from "./cards.js";
 import maleIcon from "../assets/avatar_male.svg";
 
@@ -68,7 +69,7 @@ export default Table;
 
 function ReportsTable() {
   // State to manage the SVG color for each row (use an array)
-  const [checkboxStates, setCheckboxStates] = useState(
+  const [setCheckboxStates] = useState(
     new Array(6).fill(false) // Assuming 6 rows, change as needed
   );
 
@@ -118,7 +119,10 @@ function ReportsTable() {
           </thead>
           <tbody>
             {rows.map((row, rowIndex) => (
-              <tr className="bg-white text-[#232323] border-b" key={rowIndex}>
+              <tr
+                className="bg-white text-[#232323] border-b hover:bg-gray-100"
+                key={rowIndex}
+              >
                 <td className="py-3">
                   <img src={maleIcon} alt="male student icon" />
                 </td>
@@ -152,6 +156,12 @@ function MainTable() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const handleRowClick = (student) => setSelectedStudent(student);
   const closeModal = () => setSelectedStudent(null);
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  // Function to navigate to /StudentDetails page
+  const goToStudentDetails = () => {
+    navigate("/StudentDetails");
+  };
   // State to manage table rows, including checkbox states
   const [rows, setRows] = useState([
     {
@@ -275,8 +285,11 @@ function MainTable() {
           </thead>
           <tbody>
             {rows.map((row, rowIndex) => (
-              <tr className="bg-white text-[#232323] border-b" key={rowIndex}>
-                <td className="py-3">
+              <tr
+                className="bg-white text-[#232323] border-b hover:bg-gray-100"
+                key={rowIndex}
+              >
+                <td className="py-3 cursor-pointer">
                   <img
                     onClick={() => handleRowClick(row)}
                     src={maleIcon}
@@ -334,9 +347,10 @@ function MainTable() {
             <div className="flex flex-col items-center gap-4 mt-4">
               <button
                 type="button"
+                onClick={goToStudentDetails} // Attach navigation function
                 className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded-xl"
               >
-                إظهار السجل التطوعي{" "}
+                إظهار السجل التطوعي
               </button>
               <button
                 onClick={closeModal}

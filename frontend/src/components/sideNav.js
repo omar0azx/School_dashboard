@@ -54,7 +54,8 @@ const SideNav = () => {
               <button
                 className={`w-full flex items-center justify-start px-4 h-14 rounded-[15px] ${
                   isActive("/HomePage")
-                    ? "bg-[#3bc9d327] text-[#3BCAD3]"
+                    ? // isActive("/HomePage") || isActive("/StudentDetails")
+                      "bg-[#3bc9d327] text-[#3BCAD3]"
                     : "hover:bg-[#3bc9d327] text-[#6A6A6A] hover:text-[#3BCAD3]"
                 } group`}
               >
