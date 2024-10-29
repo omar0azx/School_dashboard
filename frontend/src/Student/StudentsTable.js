@@ -1,4 +1,3 @@
-import { useState } from "react";
 import maleIcon from "../assets/avatar_male.svg";
 
 const StudentsTable = () => {
@@ -53,7 +52,10 @@ const StudentsTable = () => {
           </thead>
           <tbody>
             {rows.map((row, rowIndex) => (
-              <tr className="bg-white text-[#232323] border-b" key={rowIndex}>
+              <tr
+                className="bg-white text-[#232323] border-b hover:bg-gray-100"
+                key={rowIndex}
+              >
                 <td className="py-3">
                   <img src={maleIcon} alt="male student icon" />
                 </td>
