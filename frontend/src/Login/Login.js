@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import broIcon from "../assets/icon_bro.svg";
 import lockIcon from "../assets/icon_lock.svg";
 import showPasswordIcon from "../assets/eye_closed.svg";
@@ -116,9 +116,9 @@ const Login = () => {
 
           {/* Sign Up Link */}
           <div className="text-center mt-4">
-            <a href="/SignUpPage" className="underline text-[#747272] text-sm">
+            <Link to="/SignUpPage" className="underline text-[#747272] text-sm">
               لاتملك حساب ؟ <span className="text-[#3BCAD3]">انشئ حساب</span>
-            </a>
+            </Link>
           </div>
         </form>
       </div>
