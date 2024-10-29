@@ -45,7 +45,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="p-4 m-20 mt-5 font-sans bg-[#FFFDFA] rounded-xl">
+    <div className="p-4 m-20 mt-5 font-sans bg-[#ffffff] rounded-xl">
       <div className="mb-6 border rounded-xl bg-white shadow-sm">
         <button
           onClick={() => setIsSchoolKeyVisible(!isSchoolKeyVisible)}
@@ -155,7 +155,7 @@ const SettingsPage = () => {
       </div>
       <div className="bg-[#F3F3F3] max-h-[100vh] overflow-y-auto">
         <h2 className="text-[20px] font-semibold font-cairo text-right pr-10 mt-6">
-          الإعدادات
+          تغيير الإعدادات الخاصة بمسؤول التطوع
         </h2>{" "}
         <hr className="mt-2 mb-6 w-11/12 mx-auto border-t-2 border-gray-300" />
         <Settings />
