@@ -31,7 +31,6 @@ const Profile = () => {
   const handleChange = (e) =>
     setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
 
-  // Use useCallback to memoize handleCloseClick
   const handleCloseClick = useCallback(() => {
     setIsEditing(false);
     setUserInfo(originalUserInfo);
@@ -132,42 +131,62 @@ const Profile = () => {
             </button>
             <h2 className="text-2xl font-semibold mb-4">تغيير بيانات الحساب</h2>
             <form className="space-y-4">
-              <input
-                type="text"
-                name="name"
-                value={userInfo.name}
-                onChange={handleChange}
-                placeholder="Name"
-                className="w-full border p-2 rounded"
-              />
-              <input
-                type="text"
-                name="email"
-                value={userInfo.email}
-                onChange={handleChange}
-                placeholder="Email"
-                className="w-full border p-2 rounded"
-              />
-              <input
-                type="text"
-                name="phone"
-                value={userInfo.phone}
-                onChange={handleChange}
-                placeholder="Phone"
-                className="w-full border p-2 rounded"
-              />
-              <input
-                type="text"
-                name="location"
-                value={userInfo.location}
-                onChange={handleChange}
-                placeholder="Location"
-                className="w-full border p-2 rounded"
-              />
+              <div>
+                <label className="block text-[#3f3f3f] text-right font-sans text-lg font-semibold mb-1">
+                  الإسم الكامل:
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={userInfo.name}
+                  onChange={handleChange}
+                  placeholder="مثال: نواف محمد"
+                  className="w-full border p-2 rounded-xl bg-[#9d9d9d12]"
+                />
+              </div>
+              <div>
+                <label className="block text-[#3f3f3f] text-right font-sans text-lg font-semibold mb-1">
+                  البريد الإلكتروني:
+                </label>
+                <input
+                  type="text"
+                  name="email"
+                  value={userInfo.email}
+                  onChange={handleChange}
+                  placeholder="email@email.com"
+                  className="w-full border p-2 rounded-xl bg-[#9d9d9d12]"
+                />
+              </div>
+              <div>
+                <label className="block text-[#3f3f3f] text-right font-sans text-lg font-semibold mb-1">
+                  رقم الجوال:{" "}
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={userInfo.phone}
+                  onChange={handleChange}
+                  placeholder="05********"
+                  className="w-full border p-2 rounded-xl bg-[#9d9d9d12]"
+                />
+              </div>
+              <div>
+                <label className="block text-[#3f3f3f] text-right font-sans text-lg font-semibold mb-1">
+                  المدينة:{" "}
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={userInfo.location}
+                  onChange={handleChange}
+                  placeholder="مثال: جدة"
+                  className="w-full border p-2 rounded-xl bg-[#9d9d9d12]"
+                />
+              </div>
               <button
                 type="button"
                 onClick={handleSaveClick}
-                className="shadow-lg shadow-cyan-500/50  bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded-3xl"
+                className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded-3xl"
               >
                 حفظ التغييرات
               </button>

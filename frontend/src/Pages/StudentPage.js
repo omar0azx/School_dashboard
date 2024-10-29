@@ -21,9 +21,11 @@ function StudentPage() {
               الطُلاب الجُدد المُسجلين في المنصة:
             </h2>
           </div>
+          <hr className="mt-2 mb-6 w-11/12 mx-auto border-t-2 border-gray-300" />
           <div className="">
             <StudentsTable />
           </div>
+          <hr className="mt-2 mb-6 w-11/12 mx-auto border-t-2 border-gray-300" />
         </div>
       </section>
     </>

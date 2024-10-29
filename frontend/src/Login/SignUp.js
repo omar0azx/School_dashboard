@@ -179,7 +179,6 @@ const SignUpContent = () => {
             </Link>
           </div>
         </form>
-        {/* Right Side */}
       </div>
     </div>
   );
