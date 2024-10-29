@@ -1,51 +1,4 @@
-// import { DataTable } from "primereact/datatable";
-// import { Column } from "primereact/column";
-
-// export const Table = ({ data }) => {
-//   const products = [
-//     { code: "A1", name: "Product 1", category: "Category 1", quantity: 10 },
-//     { code: "A2", name: "Product 2", category: "Category 1", quantity: 20 },
-//     { code: "A3", name: "Product 3", category: "Category 2", quantity: 5 },
-//     { code: "A4", name: "Product 4", category: "Category 2", quantity: 10 },
-//     { code: "A5", name: "Product 5", category: "Category 3", quantity: 15 },
-//   ];
-//   return (
-//     <div>
-//       <DataTable value={products} tableStyle={{ minWidth: "50rem" }}>
-//         <Column
-//           field="code"
-//           header="Code"
-//           sortable
-//           style={{ width: "25%" }}
-//         ></Column>
-//         <Column
-//           field="name"
-//           header="Name"
-//           sortable
-//           style={{ width: "25%" }}
-//         ></Column>
-//         <Column
-//           field="category"
-//           header="Category"
-//           sortable
-//           style={{ width: "25%" }}
-//         ></Column>
-//         <Column
-//           field="quantity"
-//           header="Quantity"
-//           sortable
-//           style={{ width: "25%" }}
-//         ></Column>
-//       </DataTable>
-//     </div>
-//   );
-// };
-// export default Table;
-
 import React from "react";
-// import { format } from "date-fns";
-import { Link } from "react-router-dom";
-// import { getOrderStatus } from "../lib/helpers";
 import { useState } from "react";
 import Cards from "./cards.js";
 import maleIcon from "../assets/avatar_male.svg";
@@ -196,6 +149,9 @@ function ReportsTable() {
 }
 
 function MainTable() {
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const handleRowClick = (student) => setSelectedStudent(student);
+  const closeModal = () => setSelectedStudent(null);
   // State to manage table rows, including checkbox states
   const [rows, setRows] = useState([
     {
@@ -321,7 +277,11 @@ function MainTable() {
             {rows.map((row, rowIndex) => (
               <tr className="bg-white text-[#232323] border-b" key={rowIndex}>
                 <td className="py-3">
-                  <img src={maleIcon} alt="male student icon" />
+                  <img
+                    onClick={() => handleRowClick(row)}
+                    src={maleIcon}
+                    alt="male student icon"
+                  />
                 </td>
                 <td className="px-4 py-3">{row.name}</td>
                 <td className="px-4 py-3">{row.level}</td>
@@ -349,6 +309,45 @@ function MainTable() {
           </tbody>
         </table>
       </div>
+      {/* Modal for student details */}
+      {selectedStudent && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-xl w-[90%] max-w-md">
+            <h3 className="text-3xl font-semibold mb-8">تفاصيل الطالب</h3>
+            <p className="mb-4">
+              <strong>اسم الطالب:</strong> {selectedStudent.name}
+            </p>
+            <p className="mb-4">
+              <strong>المستوى:</strong> {selectedStudent.level}
+            </p>
+            <p className="mb-4">
+              <strong>الساعات الجديدة:</strong> {selectedStudent.newHours}
+            </p>
+            <p className="mb-4">
+              <strong>الساعات القديمة:</strong> {selectedStudent.oldHours}
+            </p>
+            <p className="mb-6">
+              <strong>التاريخ:</strong> {selectedStudent.date}
+            </p>
+
+            {/* Button container with vertical alignment */}
+            <div className="flex flex-col items-center gap-4 mt-4">
+              <button
+                type="button"
+                className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded-xl"
+              >
+                إظهار السجل التطوعي{" "}
+              </button>
+              <button
+                onClick={closeModal}
+                className="shadow-lg shadow-[#d33b3b5e] bg-[#d33b3b] hover:bg-[#d33b3be5] text-white font-bold py-2 px-6 rounded-xl"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
