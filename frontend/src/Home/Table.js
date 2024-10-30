@@ -1,21 +1,30 @@
 import React from "react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import * as XLSX from "xlsx"; // Import xlsx
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Cards from "./cards.js";
 import maleIcon from "../assets/avatar_male.svg";
 
 const Table = () => {
-  // State to track which header is clicked
   const [activeHeader, setActiveHeader] = useState("inbox");
+  const tableRef = useRef(null); // Reference to the MainTable component
 
-  // Function to handle click and set the active header
   const handleHeaderClick = (headerName) => {
     setActiveHeader(headerName);
   };
+
+  // Function to handle Excel download
+  const handleDownloadExcel = () => {
+    const tableData = tableRef.current.getTableData(); // Get latest table data from MainTable
+    const worksheet = XLSX.utils.json_to_sheet(tableData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "MainTableData");
+    XLSX.writeFile(workbook, "Students_Data.xlsx");
+  };
+
   return (
     <div className="my-3 2k:w-[95%] fullhd:w-[95%]">
       <div className="flex justify-center items-center gap-5">
-        {/* Clickable h3 Tags */}
         <h2
           className={`cursor-pointer font-bold ${
             activeHeader === "inbox"
@@ -47,19 +56,15 @@ const Table = () => {
           <h2 className="text-[20px] font-semibold font-cairo text-right pr-5">
             التحقق من توثيق الساعات الجديدة للطلاب:
           </h2>
-          <button className="ml-7 shadow-lg shadow-[#23232355]  bg-[#232323] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl">
+          <button
+            className="ml-7 shadow-lg shadow-[#23232355] bg-[#232323] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl"
+            onClick={handleDownloadExcel} // Attach download function
+          >
             تنزيل ملف الاكسل
           </button>
         </div>
       )}
-      {activeHeader === "reports" && (
-        <div className="flex mt-2 justify-between">
-          <h2 className="text-[20px] font-semibold font-cairo text-right pr-5">
-            التحقق من تقرير كل فرصة تطوعية:
-          </h2>
-        </div>
-      )}
-      {activeHeader === "inbox" && <MainTable />}
+      {activeHeader === "inbox" && <MainTable ref={tableRef} />}
       {activeHeader === "reports" && <ReportsTable />}
     </div>
   );
@@ -152,7 +157,7 @@ function ReportsTable() {
   );
 }
 
-function MainTable() {
+const MainTable = React.forwardRef((_, ref) => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const handleRowClick = (student) => setSelectedStudent(student);
   const closeModal = () => setSelectedStudent(null);
@@ -162,10 +167,11 @@ function MainTable() {
   const goToStudentDetails = () => {
     navigate("/StudentDetails");
   };
-  // State to manage table rows, including checkbox states
+
+  // State to manage table rows
   const [rows, setRows] = useState([
     {
-      name: "محمد أحمد",
+      name: "نواف أحمد",
       level: "الثالث",
       newHours: "10",
       oldHours: "20",
@@ -236,10 +242,21 @@ function MainTable() {
       date: "03/03/2022",
       isChecked: false,
     },
-    // ... more rows
+    // ... more rows as needed
   ]);
 
-  // Table headers
+  // Export table data for Excel download
+  React.useImperativeHandle(ref, () => ({
+    getTableData: () =>
+      rows.map((row) => ({
+        "اسم الطالب": row.name,
+        المستوى: row.level,
+        "الساعات الجديدة": row.newHours,
+        "الساعات القديمة": row.oldHours,
+        التاريخ: row.date,
+      })),
+  }));
+
   const headers = [
     "",
     "اسم الطالب",
@@ -250,23 +267,16 @@ function MainTable() {
     "التحقق",
   ];
 
-  // Function to handle the click event for a specific row
   const handleClick = (index) => {
     setRows((prevRows) => {
-      // Clone the rows to avoid mutating the state directly
       const updatedRows = [...prevRows];
-
-      // Toggle the `isChecked` state for the clicked row
       updatedRows[index] = {
         ...updatedRows[index],
         isChecked: !updatedRows[index].isChecked,
       };
-
-      // Move the row to the bottom of the table
       const [rowToMove] = updatedRows.splice(index, 1);
       updatedRows.push(rowToMove);
-
-      return updatedRows; // Return the updated rows
+      return updatedRows;
     });
   };
 
@@ -286,21 +296,27 @@ function MainTable() {
           <tbody>
             {rows.map((row, rowIndex) => (
               <tr
-                className="bg-white text-[#232323] border-b hover:bg-gray-100"
                 key={rowIndex}
+                className="bg-white text-[#232323] border-b hover:bg-gray-100 cursor-pointer"
               >
-                <td className="py-3 cursor-pointer">
-                  <img
-                    onClick={() => handleRowClick(row)}
-                    src={maleIcon}
-                    alt="male student icon"
-                  />
+                <td className="py-3" onClick={() => handleRowClick(row)}>
+                  <img src={maleIcon} alt="male student icon" />
                 </td>
-                <td className="px-4 py-3">{row.name}</td>
-                <td className="px-4 py-3">{row.level}</td>
-                <td className="px-4 py-3">{row.newHours}</td>
-                <td className="px-4 py-3">{row.oldHours}</td>
-                <td className="px-4 py-3">{row.date}</td>
+                <td className="px-4 py-3" onClick={() => handleRowClick(row)}>
+                  {row.name}
+                </td>
+                <td className="px-4 py-3" onClick={() => handleRowClick(row)}>
+                  {row.level}
+                </td>
+                <td className="px-4 py-3" onClick={() => handleRowClick(row)}>
+                  {row.newHours}
+                </td>
+                <td className="px-4 py-3" onClick={() => handleRowClick(row)}>
+                  {row.oldHours}
+                </td>
+                <td className="px-4 py-3" onClick={() => handleRowClick(row)}>
+                  {row.date}
+                </td>
                 <td className="px-4 py-3 flex justify-center items-center">
                   <svg
                     onClick={() => handleClick(rowIndex)}
@@ -322,7 +338,6 @@ function MainTable() {
           </tbody>
         </table>
       </div>
-      {/* Modal for student details */}
       {selectedStudent && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-40">
           <div className="bg-white p-6 rounded-xl w-[90%] max-w-md">
@@ -342,12 +357,9 @@ function MainTable() {
             <p className="mb-6">
               <strong>التاريخ:</strong> {selectedStudent.date}
             </p>
-
-            {/* Button container with vertical alignment */}
             <div className="flex flex-col items-center gap-4 mt-4">
               <button
-                type="button"
-                onClick={goToStudentDetails} // Attach navigation function
+                onClick={goToStudentDetails}
                 className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded-xl"
               >
                 إظهار السجل التطوعي
@@ -364,4 +376,4 @@ function MainTable() {
       )}
     </div>
   );
-}
+});
