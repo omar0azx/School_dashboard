@@ -69,7 +69,7 @@ function StudentContent() {
       <div className="text-center mt-4">
         <h2 className="text-2xl font-semibold">
           {/* {studentName}  */}
-          نواف محمد ابراهيم
+          عمر عبدالله{" "}
         </h2>
       </div>
 
