@@ -35,7 +35,7 @@ const SignUpContent = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(""); // State for email
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState(""); // New state for confirm password
   const [schoolCode, setSchoolCode] = useState("");
