@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-<<<<<<< HEAD
 import { Link, useNavigate } from "react-router-dom";
-=======
-import { Link } from "react-router-dom";
->>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
 import LogoSchool from "../assets/logo_Tatawei.svg";
 import blueBackground from "../assets/blueBackground.svg";
 import broIcon from "../assets/icon_bro.svg";
@@ -12,13 +8,10 @@ import emailIcon from "../assets/icon_email.svg";
 import showPasswordIcon from "../assets/eye_closed.svg";
 import hidePasswordIcon from "../assets/eye_opened.svg";
 import school from "../assets/icon_school.svg";
-<<<<<<< HEAD
 import checkedGif from "../assets/verified.gif";
 
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import app from "../firebase.js";
-=======
->>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
 
 const SignUp = () => {
   return (
@@ -234,8 +227,13 @@ const SignUpContent = () => {
           {/* Already Have Account Link */}
           <div className="text-center mt-4">
             <Link to="/loginPage" className="underline text-[#747272] text-sm">
-              تملك حساب بالفعل ؟{" "}
-              <span className="text-[#3BCAD3]">تسجيل الدخول</span>
+              <Link
+                to="/loginPage"
+                className="underline text-[#747272] text-sm"
+              >
+                تملك حساب بالفعل ؟{" "}
+                <span className="text-[#3BCAD3]">تسجيل الدخول</span>
+              </Link>
             </Link>
           </div>
         </form>
