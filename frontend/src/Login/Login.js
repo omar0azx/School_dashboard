@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+<<<<<<< HEAD
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth"; // Import Firebase methods
+import app from "../firebase.js";
+=======
+>>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
 import emailIcon from "../assets/icon_email.svg";
 import lockIcon from "../assets/icon_lock.svg";
 import showPasswordIcon from "../assets/eye_closed.svg";
@@ -9,11 +14,58 @@ const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+<<<<<<< HEAD
+  const [email, setEmail] = useState(""); // State for email
+  const [password, setPassword] = useState(""); // State for password
+  const [error, setError] = useState(""); // State for error messages
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+
+    // Check for empty fields before making a request
+    if (!email.trim()) {
+      setError("يرجى إدخال عنوان بريدك الإلكتروني");
+      return; // Exit early to prevent further execution
+    }
+
+    if (!password.trim()) {
+      setError("يرجى إدخال كلمة المرور الخاصة بك");
+      return; // Exit early to prevent further execution
+    }
+
+    const auth = getAuth(app); // Get the auth instance
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("تسجيل الدخول ناجح!");
+      navigate("/HomePage");
+    } catch (err) {
+      console.error("فشل تسجيل الدخول!", err);
+      // Improve error messages based on the error code
+      if (err.code === "auth/user-not-found") {
+        setError(
+          "لا يوجد مستخدم مسجل بهذا البريد الإلكتروني. يرجى التحقق من بريدك الإلكتروني أو التسجيل"
+        );
+      } else if (err.code === "auth/wrong-password") {
+        setError(
+          "كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى أو إعادة تعيين كلمة المرور"
+        );
+      } else if (err.code === "auth/invalid-email") {
+        setError(
+          "عنوان البريد الإلكتروني غير صحيح. يرجى إدخال بريد إلكتروني صحيح"
+        );
+      } else if (err.code === "auth/invalid-credential") {
+        setError("يرجى التأكد من صحة بريدك الإلكتروني وكلمة المرور");
+      } else {
+        setError("حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا.");
+      }
+    }
+=======
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     console.log("Login successful!");
     navigate("/HomePage");
+>>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
   };
 
   const handleForgotPasswordSubmit = (e) => {
@@ -36,7 +88,10 @@ const Login = () => {
           {isForgotPassword ? "إعادة تعيين كلمة المرور" : "تسجيل الدخول"}
         </h1>
 
+<<<<<<< HEAD
+=======
         {/* Conditional rendering for welcome text */}
+>>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
         {!isForgotPassword && (
           <h2
             className="text-xl font-medium mb-7"
@@ -47,7 +102,10 @@ const Login = () => {
         )}
 
         {isForgotPassword ? (
+<<<<<<< HEAD
+=======
           // Password Reset Form
+>>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
           <form
             onSubmit={handleForgotPasswordSubmit}
             className="w-full max-w-sm"
@@ -88,12 +146,22 @@ const Login = () => {
             </div>
           </form>
         ) : (
+<<<<<<< HEAD
+          <form onSubmit={handleLoginSubmit} className="w-full max-w-sm">
+            <div className="mb-4 relative">
+              <input
+                type="email" // Use type="email" for email input
+                id="username"
+                value={email} // Bind email state
+                onChange={(e) => setEmail(e.target.value.toLowerCase())} // Convert email to lowercase
+=======
           // Login Form
           <form onSubmit={handleLoginSubmit} className="w-full max-w-sm">
             <div className="mb-4 relative">
               <input
                 type="input"
                 id="username"
+>>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
                 className="shadow appearance-none border rounded-2xl w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline focus:shadow-outline"
                 placeholder="البريد الالكتروني"
                 style={{ backgroundColor: "#9d9d9d12" }}
@@ -105,6 +173,38 @@ const Login = () => {
                 className="absolute right-3 top-2 w-5 h-5"
               />
             </div>
+<<<<<<< HEAD
+            <div className="mb-4 relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password} // Bind password state
+                onChange={(e) => setPassword(e.target.value)} // Update password state
+                className="shadow appearance-none border rounded-2xl w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline focus:shadow-outline"
+                placeholder="كلمة المرور"
+                style={{ backgroundColor: "#9d9d9d12" }}
+                dir="rtl"
+              />
+              <img
+                src={lockIcon}
+                alt="lock icon"
+                className="absolute right-3 top-2 w-5 h-5"
+              />
+              <img
+                src={showPassword ? hidePasswordIcon : showPasswordIcon}
+                alt="toggle password visibility"
+                className="absolute left-3 top-2 w-5 h-5 cursor-pointer opacity-50"
+                onClick={togglePasswordVisibility}
+              />
+            </div>
+            {/* Display error message */}
+
+            {error && (
+              <p className="bg-red-100 text-red-700 border border-red-400 rounded-xl p-3 m-4 shadow-md text-center font-semibold">
+                {error}
+              </p>
+            )}
+=======
 
             <div className="mb-4 relative">
               <input
@@ -128,6 +228,7 @@ const Login = () => {
               />
             </div>
 
+>>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
             <div className="mb-4 text-left">
               <button
                 type="button"
@@ -137,7 +238,10 @@ const Login = () => {
                 هل نسيت كلمة المرور؟
               </button>
             </div>
+<<<<<<< HEAD
+=======
 
+>>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
             <div className="flex items-center justify-center mt-14">
               <button
                 type="submit"
@@ -150,7 +254,10 @@ const Login = () => {
                 الدخول
               </button>
             </div>
+<<<<<<< HEAD
+=======
 
+>>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
             <div className="text-center mt-4">
               <Link
                 to="/SignUpPage"
@@ -167,6 +274,8 @@ const Login = () => {
 };
 
 export default Login;
+<<<<<<< HEAD
+=======
 
 //   const [username, setUsername] = useState("");
 //   const [password, setPassword] = useState("");
@@ -277,3 +386,4 @@ export default Login;
 //     </div>
 //   );
 // };
+>>>>>>> b9719ca8e2e315cc9c98b9451b4af6e763591d0c
