@@ -80,17 +80,33 @@ app.post("/signup", async (req, res) => {
     console.log("Attempting to save new user data to Firestore:", newUser);
 
     // Save user document to Firestore
-    try {
-      const userRef = await db.collection("users").add(newUser);
-      console.log("User saved successfully with ID:", userRef.id);
-      return res.status(201).json({ message: "User created successfully" }); // Change to JSON response
-    } catch (error) {
-      console.error("Error saving user to Firestore:", error);
-      return res.status(500).json({ error: "Error saving user to Firestore." }); // Change to JSON response
+    // const userRef = await db.collection("users").add(newUser);
+    // console.log("User saved successfully with ID:", userRef.id);
+
+    // Check if the school code exists in the 'schools' collection
+    const schoolRef = db.collection("schools").doc(schoolCode);
+    const schoolDoc = await schoolRef.get();
+
+    if (schoolDoc.exists) {
+      // School exists, now create or add user data to school_officials subcollection
+      const schoolOfficialsRef = schoolRef.collection("school_officials");
+      await schoolOfficialsRef.add({
+        // userId: userRef.id,
+        name: newUser.name,
+        email: newUser.email,
+        schoolCode: newUser.schoolCode,
+        uid: newUser.uid,
+      });
+      console.log("User data saved to school_officials subcollection.");
+    } else {
+      console.log("School code not found:", schoolCode);
+      return res.status(400).send("School code not found.");
     }
+
+    return res.status(201).json({ message: "User created successfully" });
   } catch (error) {
     console.error("Error creating user:", error);
-    return res.status(500).json({ error: "Server error" }); // Change to JSON response
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
