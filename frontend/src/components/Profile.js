@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import editProfileIcon from "../assets/icon_edit.svg";
 import emailIcon from "../assets/icon_email.svg";
 import phoneIcon from "../assets/icon_phone.svg";
@@ -9,23 +10,78 @@ import profileIcon from "../assets/icon_profile.svg";
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [userInfo, setUserInfo] = useState({
-    name: "نواف محمد",
-    email: "Nawaf@gmail.com",
-    phone: "0555555555",
-    location: "جدة",
+    name: "",
+    email: "",
+    phone: "",
+    location: "",
   });
-
   const [originalUserInfo, setOriginalUserInfo] = useState(userInfo);
+  const [userEmail, setUserEmail] = useState(null);
   const modalRef = useRef(null);
+
+  // Fetch user info based on email
+  const fetchUserInfo = async (email) => {
+    try {
+      const response = await fetch(`http://localhost:5000/profile/${email}`);
+      if (!response.ok) {
+        throw new Error("User not found");
+      }
+      const data = await response.json();
+      setUserInfo(data);
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
+
+  useEffect(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserEmail(user.email);
+        fetchUserInfo(user.email);
+      } else {
+        setUserEmail(null);
+      }
+    });
+  }, []);
 
   const handleEditClick = () => {
     setIsEditing(true);
     setOriginalUserInfo(userInfo);
   };
 
-  const handleSaveClick = () => {
-    setIsEditing(false);
-    // Optionally, save the changes here (e.g., send updated data to server)
+  const handleSaveClick = async () => {
+    try {
+      setIsEditing(false);
+
+      // Prepare the data to update, setting undefined values to null
+      const updatedData = {
+        name: userInfo.name !== undefined ? userInfo.name : null,
+        phone: userInfo.phone !== undefined ? userInfo.phone : null,
+        location: userInfo.location !== undefined ? userInfo.location : null,
+      };
+
+      // Send the updated data to your backend API using the current user's email
+      const response = await fetch(`http://localhost:5000/updateProfile`, {
+        method: "POST", // Use POST to update
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: userEmail, // Use the logged-in user's email
+          ...updatedData, // Spread the updated data
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      // Optionally, fetch updated user info
+      fetchUserInfo(userEmail);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
   };
 
   const handleChange = (e) =>
@@ -152,8 +208,7 @@ const Profile = () => {
                   type="text"
                   name="email"
                   value={userInfo.email}
-                  onChange={handleChange}
-                  placeholder="email@email.com"
+                  readOnly // Make email read-only
                   className="w-full border p-2 rounded-xl bg-[#9d9d9d12]"
                 />
               </div>
@@ -166,29 +221,29 @@ const Profile = () => {
                   name="phone"
                   value={userInfo.phone}
                   onChange={handleChange}
-                  placeholder="05********"
+                  placeholder="مثال: 1234567890"
                   className="w-full border p-2 rounded-xl bg-[#9d9d9d12]"
                 />
               </div>
               <div>
                 <label className="block text-[#3f3f3f] text-right font-sans text-lg font-semibold mb-1">
-                  المدينة:{" "}
+                  الموقع:
                 </label>
                 <input
                   type="text"
                   name="location"
                   value={userInfo.location}
                   onChange={handleChange}
-                  placeholder="مثال: جدة"
+                  placeholder="مثال: الرياض"
                   className="w-full border p-2 rounded-xl bg-[#9d9d9d12]"
                 />
               </div>
               <button
                 type="button"
                 onClick={handleSaveClick}
-                className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded-3xl"
+                className="w-full bg-[#3f3f3f] text-white py-2 rounded-xl"
               >
-                حفظ التغييرات
+                حفظ
               </button>
             </form>
           </div>

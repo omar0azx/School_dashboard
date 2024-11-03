@@ -130,6 +130,68 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+// Endpoint for fetching user info by email
+app.get("/profile/:email", async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    const schoolCode = "00001"; // You can modify this to fetch dynamically if needed
+    const schoolRef = db.collection("schools").doc(schoolCode);
+    const schoolOfficialsRef = schoolRef.collection("school_officials");
+
+    const querySnapshot = await schoolOfficialsRef
+      .where("email", "==", email)
+      .get();
+
+    if (querySnapshot.empty) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Assuming only one user will match
+    const userData = querySnapshot.docs[0].data();
+    res.status(200).json(userData);
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Endpoint for updating user profile
+app.post("/updateProfile", async (req, res) => {
+  const { email } = req.body; // Get email from request body
+  const { name, phone, location } = req.body;
+
+  // Prepare the update data
+  const updateData = {
+    name: name !== undefined ? name : null,
+    phone: phone !== undefined ? phone : null,
+    location: location !== undefined ? location : null,
+  };
+
+  try {
+    const schoolCode = "00001"; // Replace with dynamic school code if necessary
+    const schoolRef = db.collection("schools").doc(schoolCode);
+    const schoolOfficialsRef = schoolRef.collection("school_officials");
+
+    // Find the user with the matching email
+    const querySnapshot = await schoolOfficialsRef
+      .where("email", "==", email)
+      .get();
+
+    if (querySnapshot.empty) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Assuming there's only one user with the matching email
+    const userDoc = querySnapshot.docs[0];
+
+    await userDoc.ref.update(updateData); // Update the user document
+    res.status(200).send({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 // Start the server
 app.listen(PORT, () => {
