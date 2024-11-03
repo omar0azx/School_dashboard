@@ -1,12 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
+const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Firebase setup
+// Firebase setup using environment variables
 const serviceAccount = {
   type: process.env.FIREBASE_TYPE,
   project_id: process.env.FIREBASE_PROJECT_ID,
@@ -18,36 +19,78 @@ const serviceAccount = {
   token_uri: process.env.FIREBASE_TOKEN_URI,
   auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_CERT_URL,
   client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
-  universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
 };
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-app.use(cors());
+const db = admin.firestore(); // Initialize Firestore
+
+// CORS setup
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Adjust according to your frontend port
+    methods: ["POST"],
+  })
+);
 app.use(express.json());
 
-// Signup endpoint
+// Endpoint for user signup
 app.post("/signup", async (req, res) => {
-  const { email, password } = req.body;
+  console.log("Request body:", req.body);
+  const { name, email, password, uid, schoolCode } = req.body; // Include schoolCode
 
-  if (!email.includes("@") || password.length < 6) {
-    return res.status(400).json({ error: "Invalid email or password length." });
+  // Validate input
+  if (
+    !name ||
+    !email ||
+    !email.includes("@") ||
+    !password ||
+    password.length < 6 ||
+    !schoolCode
+  ) {
+    console.log("Validation failed:", { name, email, password, schoolCode });
+    return res.status(400).send("Invalid name, email, or password.");
   }
 
   try {
-    const userRecord = await admin.auth().createUser({
+    // Check if a user with the provided UID already exists
+    // try {
+    //   await admin.auth().getUser(uid);
+    //   return res.status(400).json({ message: "User with this UID already exists." });
+    // } catch (error) {
+    //   if (error.code !== "auth/user-not-found") {
+    //     return res.status(500).json({ message: "Error checking user: " + error.message });
+    //   }
+    // }
+
+    // Hash password
+    console.log("Hashing password...");
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user data object
+    const newUser = {
+      name, // Include name
       email,
-      password,
-    });
-    return res.status(201).json({ message: "User created successfully" });
+      password: hashedPassword, // Store hashed password
+      uid, // Store UID from Firebase Auth
+      schoolCode, // Save the school code here
+    };
+    console.log("Attempting to save new user data to Firestore:", newUser);
+
+    // Save user document to Firestore
+    try {
+      const userRef = await db.collection("users").add(newUser);
+      console.log("User saved successfully with ID:", userRef.id);
+      return res.status(201).json({ message: "User created successfully" }); // Change to JSON response
+    } catch (error) {
+      console.error("Error saving user to Firestore:", error);
+      return res.status(500).json({ error: "Error saving user to Firestore." }); // Change to JSON response
+    }
   } catch (error) {
     console.error("Error creating user:", error);
-    if (error.code === "auth/email-already-exists") {
-      return res.status(400).json({ error: "Email already in use." });
-    }
-    res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: "Server error" }); // Change to JSON response
   }
 });
 

@@ -35,12 +35,12 @@ const SignUpContent = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
-  const [email, setEmail] = useState(""); // State for email
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // New state for confirm password
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [schoolCode, setSchoolCode] = useState("");
-  const [error, setError] = useState(""); // State for error messages
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // State for the success modal
+  const [error, setError] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -53,30 +53,54 @@ const SignUpContent = () => {
 
     // Validate required fields
     if (!email || !password || !name || !schoolCode) {
-      setError("يرجى ملء جميع الحقول المطلوبة"); // Display error message if fields are empty
+      setError("يرجى ملء جميع الحقول المطلوبة");
       return;
     }
 
-    // Check if password and confirm password match
     if (password !== confirmPassword) {
-      setError("كلمات المرور غير متطابقة"); // Display error message if passwords do not match
+      setError("كلمات المرور غير متطابقة");
       return;
     }
 
     try {
       // Create a new user with email and password
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      const response = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          name,
+          password, // Include password in the request
+          schoolCode,
+          uid: user.uid,
+        }),
+      });
+
+      const data = await response.json(); // Ensure this is parsed as JSON
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create user in Firestore");
+      }
 
       // Show success modal
       setShowSuccessModal(true);
 
-      // Set a timer to navigate to login page after 3 seconds
+      // Redirect to login page after 3 seconds
       setTimeout(() => {
         setShowSuccessModal(false);
-        navigate("/loginPage"); // Redirect to login page
+        navigate("/loginPage");
       }, 5000);
     } catch (error) {
-      // Handle Firebase error messages with improved content
+      // Handle errors
       let errorMessage = "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا";
       if (error.code === "auth/invalid-email") {
         errorMessage =
@@ -87,7 +111,7 @@ const SignUpContent = () => {
         errorMessage =
           "البريد الإلكتروني مستخدم بالفعل. يرجى استخدام بريد إلكتروني آخر";
       }
-      setError(errorMessage); // Set the error message to display
+      setError(errorMessage);
       console.error("Error:", error);
     }
   };
