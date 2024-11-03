@@ -2,12 +2,16 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { showSignOutAlert } from "./sideNav.js";
 import { useNavigate } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const Nav = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const dropdownRef = useRef(null); // Create a ref for the dropdown
+  const dropdownRef = useRef(null);
   const location = useLocation();
+  const [firstName, setFirstName] = useState("");
+  const [userEmail, setUserEmail] = useState(null);
+
   const isActive = (path) => location.pathname === path;
 
   const toggleDropdown = () => {
@@ -18,6 +22,36 @@ const Nav = () => {
     // Perform any logout operations here
     showSignOutAlert(navigate);
   };
+
+  // Function to fetch user info and set only the first name
+  const fetchUserInfo = async (email) => {
+    try {
+      const response = await fetch(`http://localhost:5000/profile/${email}`);
+      if (!response.ok) {
+        throw new Error("User not found");
+      }
+      const data = await response.json();
+      const fullName = data.name;
+      const firstNameOnly = fullName.split(" ")[0];
+      setFirstName(firstNameOnly);
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
+
+  // Monitor authentication state
+  useEffect(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserEmail(user.email);
+        fetchUserInfo(user.email);
+      } else {
+        setUserEmail(null);
+        setFirstName(""); // Clear first name if not logged in
+      }
+    });
+  }, []);
 
   // Close dropdown if clicking outside of it
   useEffect(() => {
@@ -80,7 +114,7 @@ const Nav = () => {
 
         <button onClick={toggleDropdown} className="focus:outline-none ">
           <h3 className="text-[18px] font-semibold text-black font-cairo cursor-pointer transition-all duration-300 ease-in-out hover:scale-105">
-            أهلًا أ.نواف,
+            أهلًا أ.{firstName},
           </h3>
         </button>
 
