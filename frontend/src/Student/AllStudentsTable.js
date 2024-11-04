@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import maleIcon from "../assets/avatar_male.svg";
+import Loader from "../components/Loader.js"; // Import the Loader component
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const AllStudentsTable = () => {
   const navigate = useNavigate();
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state
+
   const handleRowClick = (student) => setSelectedStudent(student || {});
   const closeModal = () => setSelectedStudent(null);
 
@@ -24,8 +28,6 @@ const AllStudentsTable = () => {
     "رقم الجوال",
   ];
 
-  const [students, setStudents] = useState([]);
-
   useEffect(() => {
     const email = localStorage.getItem("userEmail");
 
@@ -37,6 +39,8 @@ const AllStudentsTable = () => {
       } catch (error) {
         console.error("Error fetching students:", error);
         setStudents([]);
+      } finally {
+        setLoading(false); // Set loading to false after data fetch
       }
     };
 
@@ -44,8 +48,14 @@ const AllStudentsTable = () => {
       fetchStudents();
     } else {
       console.warn("No email found for logged-in user.");
+      setLoading(false); // Set loading to false if no email
     }
   }, []);
+
+  // Show loader while loading
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <div className="my-5 mx-20 bg-white px-4 pt-3 pb-4 rounded-3xl border border-gray-200 flex-1">
