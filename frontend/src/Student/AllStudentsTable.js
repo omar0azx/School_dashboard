@@ -1,34 +1,42 @@
 import { useState, useEffect } from "react";
 import maleIcon from "../assets/avatar_male.svg";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const AllStudentsTable = () => {
+  const navigate = useNavigate();
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const handleRowClick = (student) => setSelectedStudent(student || {});
+  const closeModal = () => setSelectedStudent(null);
+
+  // Function to navigate to /StudentDetails page
+  const goToStudentDetails = () => {
+    if (selectedStudent) {
+      navigate("/StudentDetails", { state: { student: selectedStudent } });
+    }
+  };
+
   const headers = [
     "",
     "اسم الطالب",
     "المستوى",
     "البريد الإلكتروني",
     "رقم الجوال",
-    "",
-    "",
   ];
 
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
-    // Assume the email is stored in localStorage or another state management solution
-    const email = localStorage.getItem("userEmail"); // or obtain it from context if available
+    const email = localStorage.getItem("userEmail");
 
     const fetchStudents = async () => {
       try {
-        // Include the email as a parameter in the request URL
         const response = await fetch(`http://localhost:5000/students/${email}`);
         const data = await response.json();
-
-        // Ensure data is an array
         setStudents(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching students:", error);
-        setStudents([]); // Fallback to empty array if error
+        setStudents([]);
       }
     };
 
@@ -58,14 +66,15 @@ const AllStudentsTable = () => {
                 <tr
                   key={index}
                   className="bg-white text-[#232323] border-b hover:bg-gray-100"
+                  onClick={() => handleRowClick(student)}
                 >
                   <td className="py-3">
                     <img src={maleIcon} alt="male student icon" />
                   </td>
-                  <td className="px-3 py-3">{student.name}</td>
-                  <td className="px-3 py-3">{student.level}</td>
-                  <td className="px-3 py-3">{student.email}</td>
-                  <td className="px-3 py-3">{student.phoneNumber}</td>
+                  <td className="px-3 py-3">{student.name || "N/A"}</td>
+                  <td className="px-3 py-3">{student.level || "N/A"}</td>
+                  <td className="px-3 py-3">{student.email || "N/A"}</td>
+                  <td className="px-3 py-3">{student.phoneNumber || "N/A"}</td>
                 </tr>
               ))
             ) : (
@@ -78,6 +87,44 @@ const AllStudentsTable = () => {
           </tbody>
         </table>
       </div>
+      {selectedStudent && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-xl w-[90%] max-w-md">
+            <h3 className="text-3xl font-semibold mb-8">تفاصيل الطالب</h3>
+            <p className="mb-4">
+              <strong>اسم الطالب:</strong> {selectedStudent.name || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>المستوى:</strong> {selectedStudent.level || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>الساعات الجديدة:</strong>{" "}
+              {selectedStudent.newHours || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>الساعات القديمة:</strong>{" "}
+              {selectedStudent.oldHours || "N/A"}
+            </p>
+            <p className="mb-6">
+              <strong>التاريخ:</strong> {selectedStudent.date || "N/A"}
+            </p>
+            <div className="flex flex-col items-center gap-4 mt-4">
+              <button
+                onClick={goToStudentDetails}
+                className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded-xl"
+              >
+                إظهار السجل التطوعي
+              </button>
+              <button
+                onClick={closeModal}
+                className="shadow-lg shadow-[#d33b3b5e] bg-[#d33b3b] hover:bg-[#d33b3be5] text-white font-bold py-2 px-6 rounded-xl"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
