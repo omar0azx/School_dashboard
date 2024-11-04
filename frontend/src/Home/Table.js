@@ -158,16 +158,6 @@ function ReportsTable() {
 }
 
 const MainTable = React.forwardRef((_, ref) => {
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const handleRowClick = (student) => setSelectedStudent(student);
-  const closeModal = () => setSelectedStudent(null);
-  const navigate = useNavigate(); // Initialize useNavigate
-
-  // Function to navigate to /StudentDetails page
-  const goToStudentDetails = () => {
-    navigate("/StudentDetails");
-  };
-
   // State to manage table rows
   const [rows, setRows] = useState([
     {
@@ -299,24 +289,14 @@ const MainTable = React.forwardRef((_, ref) => {
                 key={rowIndex}
                 className="bg-white text-[#232323] border-b hover:bg-gray-100 cursor-pointer"
               >
-                <td className="py-3" onClick={() => handleRowClick(row)}>
+                <td className="py-3">
                   <img src={maleIcon} alt="male student icon" />
                 </td>
-                <td className="px-4 py-3" onClick={() => handleRowClick(row)}>
-                  {row.name}
-                </td>
-                <td className="px-4 py-3" onClick={() => handleRowClick(row)}>
-                  {row.level}
-                </td>
-                <td className="px-4 py-3" onClick={() => handleRowClick(row)}>
-                  {row.newHours}
-                </td>
-                <td className="px-4 py-3" onClick={() => handleRowClick(row)}>
-                  {row.oldHours}
-                </td>
-                <td className="px-4 py-3" onClick={() => handleRowClick(row)}>
-                  {row.date}
-                </td>
+                <td className="px-4 py-3">{row.name}</td>
+                <td className="px-4 py-3">{row.level}</td>
+                <td className="px-4 py-3">{row.newHours}</td>
+                <td className="px-4 py-3">{row.oldHours}</td>
+                <td className="px-4 py-3">{row.date}</td>
                 <td className="px-4 py-3 flex justify-center items-center">
                   <svg
                     onClick={() => handleClick(rowIndex)}
@@ -338,42 +318,6 @@ const MainTable = React.forwardRef((_, ref) => {
           </tbody>
         </table>
       </div>
-      {selectedStudent && (
-        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-40">
-          <div className="bg-white p-6 rounded-xl w-[90%] max-w-md">
-            <h3 className="text-3xl font-semibold mb-8">تفاصيل الطالب</h3>
-            <p className="mb-4">
-              <strong>اسم الطالب:</strong> {selectedStudent.name}
-            </p>
-            <p className="mb-4">
-              <strong>المستوى:</strong> {selectedStudent.level}
-            </p>
-            <p className="mb-4">
-              <strong>الساعات الجديدة:</strong> {selectedStudent.newHours}
-            </p>
-            <p className="mb-4">
-              <strong>الساعات القديمة:</strong> {selectedStudent.oldHours}
-            </p>
-            <p className="mb-6">
-              <strong>التاريخ:</strong> {selectedStudent.date}
-            </p>
-            <div className="flex flex-col items-center gap-4 mt-4">
-              <button
-                onClick={goToStudentDetails}
-                className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded-xl"
-              >
-                إظهار السجل التطوعي
-              </button>
-              <button
-                onClick={closeModal}
-                className="shadow-lg shadow-[#d33b3b5e] bg-[#d33b3b] hover:bg-[#d33b3be5] text-white font-bold py-2 px-6 rounded-xl"
-              >
-                إغلاق
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 });

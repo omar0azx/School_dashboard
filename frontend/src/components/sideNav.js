@@ -35,6 +35,7 @@ const SideNav = () => {
   const handleSignOut = () => {
     // Call the SweetAlert and navigation function
     showSignOutAlert(navigate);
+    localStorage.removeItem("userEmail");
   };
   // Conditionally apply hover and text styles based on the current location
   const isActive = (path) => location.pathname === path;

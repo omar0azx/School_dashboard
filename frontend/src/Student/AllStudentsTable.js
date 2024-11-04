@@ -1,43 +1,54 @@
+import { useState, useEffect } from "react";
 import maleIcon from "../assets/avatar_male.svg";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const AllStudentsTable = () => {
-  // Table headers
+  const navigate = useNavigate();
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const handleRowClick = (student) => setSelectedStudent(student || {});
+  const closeModal = () => setSelectedStudent(null);
+
+  // Function to navigate to /StudentDetails page
+  const goToStudentDetails = () => {
+    if (selectedStudent) {
+      navigate("/StudentDetails", { state: { student: selectedStudent } });
+    }
+  };
+
   const headers = [
     "",
     "اسم الطالب",
     "المستوى",
     "البريد الإلكتروني",
     "رقم الجوال",
-    "",
-    "",
   ];
 
-  const rows = [
-    ["أحمد علي", "الثاني", "ahmed.ali@example.com", "0551234567"],
-    ["سعيد محمد", "الرابع", "mohamed.ahmed@example.com", "0557654321"],
-    ["علي سعيد", "الأول", "sara.mohammed@example.com", "0559876543"],
-    ["خالد سالم", "الثالث", "fatima.hassan@example.com", "0556543210"],
-    ["نواف حسن", "الثاني", "khaled.salem@example.com", "0554321098"],
-    ["محمد أحمد", "الثالث", "ali.saeed@example.com", "0553210987"],
-    ["أحمد علي", "الثاني", "reem.abdullah@example.com", "0558765432"],
-    ["سعيد محمد", "الرابع", "nora.youssef@example.com", "0555678901"],
-    ["علي سعيد", "الأول", "abdullah.khaled@example.com", "0550987654"],
-    ["خالد سالم", "الثالث", "ameera.hassan@example.com", "0552345678"],
-    ["نواف حسن", "الثاني", "youssef.ahmed@example.com", "0553456789"],
-    ["محمد أحمد", "الثالث", "salman.abdullah@example.com", "0554567890"],
-    ["أحمد علي", "الثاني", "layla.mahmoud@example.com", "0555678902"],
-    ["سعيد محمد", "الرابع", "faisal.salem@example.com", "0556789012"],
-    ["علي سعيد", "الأول", "manal.youssef@example.com", "0557890123"],
-    ["خالد سالم", "الثالث", "turki.nasser@example.com", "0558901234"],
-    ["نواف حسن", "الثاني", "khadija.mohammed@example.com", "0559012345"],
-    ["محمد أحمد", "الثالث", "ayman.saeed@example.com", "0550123456"],
-    ["أحمد علي", "الثاني", "lian.fahd@example.com", "0551234500"],
-  ];
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    const email = localStorage.getItem("userEmail");
+
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/students/${email}`);
+        const data = await response.json();
+        setStudents(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error fetching students:", error);
+        setStudents([]);
+      }
+    };
+
+    if (email) {
+      fetchStudents();
+    } else {
+      console.warn("No email found for logged-in user.");
+    }
+  }, []);
 
   return (
     <div className="my-5 mx-20 bg-white px-4 pt-3 pb-4 rounded-3xl border border-gray-200 flex-1">
-      {/* <div className="border-x border-gray-200 rounded mt-3 bg-black p-5"> */}
-      {/* Add a wrapper div with max-height and overflow-y-auto */}
       <div className="max-h-64 lg:max-h-[60vh] overflow-y-auto">
         <table className="w-full text-[#718EBF] bg-white">
           <thead className="border-b-2 border-gray-300">
@@ -50,25 +61,70 @@ const AllStudentsTable = () => {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, rowIndex) => (
-              <tr
-                className="bg-white text-[#232323] border-b hover:bg-gray-100"
-                key={rowIndex}
-              >
-                <td className="py-3">
-                  <img src={maleIcon} alt="male student icon" />
-                </td>
-                {row.map((cell, cellIndex) => (
-                  <td className="px-3 py-3" key={cellIndex}>
-                    {cell}
+            {students.length > 0 ? (
+              students.map((student, index) => (
+                <tr
+                  key={index}
+                  className="bg-white text-[#232323] border-b hover:bg-gray-100"
+                  onClick={() => handleRowClick(student)}
+                >
+                  <td className="py-3">
+                    <img src={maleIcon} alt="male student icon" />
                   </td>
-                ))}
+                  <td className="px-3 py-3">{student.name || "N/A"}</td>
+                  <td className="px-3 py-3">{student.level || "N/A"}</td>
+                  <td className="px-3 py-3">{student.email || "N/A"}</td>
+                  <td className="px-3 py-3">{student.phoneNumber || "N/A"}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={headers.length} className="text-center py-3">
+                  لايوجد طلاب
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
-      {/* </div> */}
+      {selectedStudent && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-xl w-[90%] max-w-md">
+            <h3 className="text-3xl font-semibold mb-8">تفاصيل الطالب</h3>
+            <p className="mb-4">
+              <strong>اسم الطالب:</strong> {selectedStudent.name || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>المستوى:</strong> {selectedStudent.level || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>الساعات الجديدة:</strong>{" "}
+              {selectedStudent.newHours || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>الساعات القديمة:</strong>{" "}
+              {selectedStudent.oldHours || "N/A"}
+            </p>
+            <p className="mb-6">
+              <strong>التاريخ:</strong> {selectedStudent.date || "N/A"}
+            </p>
+            <div className="flex flex-col items-center gap-4 mt-4">
+              <button
+                onClick={goToStudentDetails}
+                className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded-xl"
+              >
+                إظهار السجل التطوعي
+              </button>
+              <button
+                onClick={closeModal}
+                className="shadow-lg shadow-[#d33b3b5e] bg-[#d33b3b] hover:bg-[#d33b3be5] text-white font-bold py-2 px-6 rounded-xl"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

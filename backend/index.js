@@ -135,21 +135,32 @@ app.get("/profile/:email", async (req, res) => {
   const { email } = req.params;
 
   try {
-    const schoolCode = "00001"; // You can modify this to fetch dynamically if needed
-    const schoolRef = db.collection("schools").doc(schoolCode);
-    const schoolOfficialsRef = schoolRef.collection("school_officials");
+    // Step 1: Search across all schools to find the user by email
+    const schoolsRef = db.collection("schools");
+    const querySnapshot = await schoolsRef.get();
 
-    const querySnapshot = await schoolOfficialsRef
-      .where("email", "==", email)
-      .get();
+    let userData = null;
+    let schoolCode = null;
 
-    if (querySnapshot.empty) {
+    for (const doc of querySnapshot.docs) {
+      const schoolOfficialsRef = doc.ref.collection("school_officials");
+      const userSnapshot = await schoolOfficialsRef
+        .where("email", "==", email)
+        .get();
+
+      if (!userSnapshot.empty) {
+        schoolCode = doc.id; // Found the schoolCode
+        userData = userSnapshot.docs[0].data(); // Get user data
+        break;
+      }
+    }
+
+    if (!userData) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // Assuming only one user will match
-    const userData = querySnapshot.docs[0].data();
-    res.status(200).json(userData);
+    // Step 2: Return the user data with the dynamic schoolCode
+    res.status(200).json({ ...userData, schoolCode });
   } catch (error) {
     console.error("Error fetching user profile:", error);
     res.status(500).json({ error: "Server error" });
@@ -158,37 +169,88 @@ app.get("/profile/:email", async (req, res) => {
 
 // Endpoint for updating user profile
 app.post("/updateProfile", async (req, res) => {
-  const { email } = req.body; // Get email from request body
-  const { name, phone, location } = req.body;
+  const { email, name, phone, location } = req.body; // Get details from request body
 
   // Prepare the update data
   const updateData = {
-    name: name !== undefined ? name : null,
-    phone: phone !== undefined ? phone : null,
-    location: location !== undefined ? location : null,
+    ...(name !== undefined && { name }),
+    ...(phone !== undefined && { phone }),
+    ...(location !== undefined && { location }),
   };
 
   try {
-    const schoolCode = "00001"; // Replace with dynamic school code if necessary
-    const schoolRef = db.collection("schools").doc(schoolCode);
-    const schoolOfficialsRef = schoolRef.collection("school_officials");
+    // Step 1: Search across all schools to find the user by email
+    const schoolsRef = db.collection("schools");
+    const querySnapshot = await schoolsRef.get();
 
-    // Find the user with the matching email
-    const querySnapshot = await schoolOfficialsRef
-      .where("email", "==", email)
-      .get();
+    let userDocRef = null;
 
-    if (querySnapshot.empty) {
+    for (const doc of querySnapshot.docs) {
+      const schoolOfficialsRef = doc.ref.collection("school_officials");
+      const userSnapshot = await schoolOfficialsRef
+        .where("email", "==", email)
+        .get();
+
+      if (!userSnapshot.empty) {
+        // Found the user document
+        userDocRef = userSnapshot.docs[0].ref;
+        break;
+      }
+    }
+
+    if (!userDocRef) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // Assuming there's only one user with the matching email
-    const userDoc = querySnapshot.docs[0];
-
-    await userDoc.ref.update(updateData); // Update the user document
+    // Step 2: Update the user document
+    await userDocRef.update(updateData);
     res.status(200).send({ message: "Profile updated successfully" });
   } catch (error) {
     console.error("Error updating profile:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Endpoint for fetching students for the logged-in user's school
+app.get("/students/:email", async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    // Step 1: Search across all schools to find the schoolCode for the user by email
+    const schoolsRef = db.collection("schools");
+    const querySnapshot = await schoolsRef.get();
+
+    let schoolCode = null;
+
+    for (const doc of querySnapshot.docs) {
+      const schoolOfficialsRef = doc.ref.collection("school_officials");
+      const userSnapshot = await schoolOfficialsRef
+        .where("email", "==", email)
+        .get();
+
+      if (!userSnapshot.empty) {
+        schoolCode = doc.id; // Found the schoolCode
+        break;
+      }
+    }
+
+    if (!schoolCode) {
+      return res.status(404).json({ error: "School not found for the user." });
+    }
+
+    // Step 2: Use the retrieved schoolCode to fetch students
+    const schoolRef = db.collection("schools").doc(schoolCode);
+    const studentsRef = schoolRef.collection("students");
+    const studentsSnapshot = await studentsRef.get();
+
+    if (studentsSnapshot.empty) {
+      return res.status(404).json({ error: "No students found." });
+    }
+
+    const students = studentsSnapshot.docs.map((doc) => doc.data());
+    res.status(200).json(students);
+  } catch (error) {
+    console.error("Error fetching students:", error);
     res.status(500).json({ error: "Server error" });
   }
 });

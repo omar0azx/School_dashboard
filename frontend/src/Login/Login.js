@@ -33,6 +33,7 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("تسجيل الدخول ناجح!");
+      localStorage.setItem("userEmail", email);
       navigate("/HomePage");
     } catch (err) {
       console.error("فشل تسجيل الدخول!", err);
