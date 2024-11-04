@@ -21,6 +21,7 @@ const Nav = () => {
   const handleLogout = () => {
     // Perform any logout operations here
     showSignOutAlert(navigate);
+    localStorage.removeItem("userEmail");
   };
 
   // Function to fetch user info and set only the first name
