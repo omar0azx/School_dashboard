@@ -221,7 +221,7 @@ const Profile = () => {
                   name="phone"
                   value={userInfo.phone}
                   onChange={handleChange}
-                  placeholder="مثال: 1234567890"
+                  placeholder="********05"
                   className="w-full border p-2 rounded-xl bg-[#9d9d9d12]"
                 />
               </div>

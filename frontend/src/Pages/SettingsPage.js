@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SettingsSideNav from "../components/sideNav.js";
 import SettingsNav from "../components/nav.js";
 import { showSignOutAlert } from "../components/sideNav.js";
 import { useNavigate } from "react-router-dom";
+import { getAuth, onAuthStateChanged, deleteUser } from "firebase/auth";
+import { getFirestore, doc, deleteDoc } from "firebase/firestore";
+import { getDocs, query, where, collection } from "firebase/firestore";
 
 import showPasswordIcon from "../assets/eye_closed.svg";
 import hidePasswordIcon from "../assets/eye_opened.svg";
@@ -13,11 +16,36 @@ const Settings = () => {
   const [showPassword, setShowPassword] = useState(false); // Password visibility state
   const [schoolKey, setSchoolKey] = useState("");
   const [password, setPassword] = useState("");
+  const [userInfo, setUserInfo] = useState({ schoolCode: "" });
+  // const [originalUserInfo, setOriginalUserInfo] = useState(userInfo);
+  // const [userEmail, setUserEmail] = useState(null);
 
   const navigate = useNavigate();
+  const fetchUserInfo = async (email) => {
+    try {
+      const response = await fetch(`http://localhost:5000/profile/${email}`);
+      if (!response.ok) {
+        throw new Error("User not found");
+      }
+      const data = await response.json();
+      setUserInfo(data);
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
+  useEffect(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // setUserEmail(user.email);
+        fetchUserInfo(user.email);
+      } else {
+        // setUserEmail(null);
+      }
+    });
+  }, []);
 
   const handleChangeSchoolKey = () => {
-    // Handle logic for changing the school key
     console.log("New School Key:", schoolKey);
     setSchoolKey("");
     setIsSchoolKeyVisible(false);
@@ -30,9 +58,71 @@ const Settings = () => {
     setIsPasswordVisible(false);
   };
 
-  const handleDeleteAccount = () => {
-    // Handle logic for deleting the account
-    console.log("Account Deleted");
+  const handleDeleteAccount = async () => {
+    const auth = getAuth();
+    const db = getFirestore();
+
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userEmail = user.email;
+
+        // Fetch user info to retrieve schoolCode
+        const response = await fetch(
+          `http://localhost:5000/profile/${userEmail}`
+        );
+        if (!response.ok) {
+          throw new Error("User not found");
+        }
+        const userData = await response.json();
+        const schoolCode = userData.schoolCode;
+
+        if (schoolCode) {
+          // Locate the school document and access its 'school_officials' subcollection
+          const schoolOfficialsRef = collection(
+            db,
+            "schools",
+            schoolCode,
+            "school_officials"
+          );
+          const q = query(schoolOfficialsRef, where("email", "==", userEmail));
+          const querySnapshot = await getDocs(q);
+
+          if (!querySnapshot.empty) {
+            const userDocRef = doc(
+              db,
+              "schools",
+              schoolCode,
+              "school_officials",
+              querySnapshot.docs[0].id
+            );
+
+            try {
+              await deleteDoc(userDocRef);
+              console.log("User data deleted from Firestore.");
+            } catch (error) {
+              console.error("Error deleting user data from Firestore:", error);
+            }
+          } else {
+            console.log("No user found in school_officials.");
+          }
+
+          // Delete the Firebase Authentication account
+          await deleteUser(user);
+          console.log("User account deleted from Firebase Authentication.");
+
+          alert("Your account has been deleted successfully.");
+          navigate("/loginPage");
+        } else {
+          console.error("No schoolCode found for the user.");
+        }
+      } else {
+        console.log("No authenticated user found.");
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("Error deleting account. Please try again later.");
+    }
   };
 
   const handleLogout = () => {
@@ -51,7 +141,10 @@ const Settings = () => {
           onClick={() => setIsSchoolKeyVisible(!isSchoolKeyVisible)}
           className="flex justify-between items-center w-full text-left text-black p-2 rounded-xl hover:bg-[#ffffffd4] focus:outline-none border bg-white shadow-md"
         >
-          <span className="opacity-35">تغيير رمز المدرسة</span>
+          <span className="opacity-35">
+            تغيير الرمز الحالي للمدرسة: {userInfo.schoolCode || "N/A"}
+            {/* Display the fetched school code */}
+          </span>
           <span>{isSchoolKeyVisible ? "▲" : "▼"}</span>
         </button>
         {isSchoolKeyVisible && (

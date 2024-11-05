@@ -5,6 +5,7 @@ import HomePage from "./Pages/HomePage"; // Import your HomePage component
 import StudentPage from "./Pages/StudentPage.js";
 import ProfilePage from "./Pages/ProfilePage.js";
 import SettingsPage from "./Pages/SettingsPage.js";
+import NotificationPage from "./Pages/NotificationsPage.js";
 import StudentDetails from "./Home/StudentDetails.js";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/StudentPage" element={<StudentPage />} />
           <Route path="/ProfilePage" element={<ProfilePage />} />
           <Route path="/SettingsPage" element={<SettingsPage />} />
+          <Route path="/NotificationPage" element={<NotificationPage />} />
           <Route path="/StudentDetails" element={<StudentDetails />} />
         </Routes>
       </BrowserRouter>

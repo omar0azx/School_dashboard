@@ -77,6 +77,7 @@ const Nav = () => {
           {isActive("/ProfilePage") && "الملف الشخصي"}
           {isActive("/SettingsPage") && "الإعدادات"}
           {isActive("/StudentDetails") && "السجل التطوعي للطالب"}
+          {isActive("/NotificationPage") && "الإشعارات"}
         </span>
       </div>
       <div className="flex justify-center relative w-full max-w-md">
