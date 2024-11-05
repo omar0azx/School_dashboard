@@ -2,6 +2,7 @@ import SideNav from "../components/sideNav.js";
 import Nav from "../components/nav.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa"; // Import back icon
+import maleIcon from "../assets/avatar_male.svg";
 
 const StudentDetails = () => {
   const location = useLocation();
@@ -37,7 +38,7 @@ function StudentContent({ student, navigate }) {
       <div className="flex justify-start">
         <button
           onClick={() => navigate("/StudentPage")}
-          className="flex items-center text-[#3BCAD3] text-2xl py-2 px-4 rounded focus:outline-none 
+          className="flex items-center text-[#3BCAD3] text-xl py-2 px-4 rounded-2xl focus:outline-none 
              hover:bg-[#3BCAD3] hover:text-white hover:shadow-lg transition-all duration-200"
         >
           <FaArrowRight className="mx-2" /> {/* Back Icon */}
@@ -45,11 +46,28 @@ function StudentContent({ student, navigate }) {
         </button>
       </div>
 
-      {/* Student Name and Record Label */}
-      <div className="text-center mt-4">
-        <h2 className="text-2xl font-semibold">
-          {student.name || "N/A"} {/* Display student name or "N/A" */}
-        </h2>
+      <hr className="mt-2 mb-6 w-11/12 mx-auto border-t-2 border-gray-300" />
+
+      {/* Student Name and Report Button in Row */}
+      <div className="flex justify-between items-center mt-4 mx-20">
+        <div className="flex items-center mr-4">
+          <img src={maleIcon} alt="male student icon" />
+          <h2 className="text-2xl font-semibold mr-4">
+            {student.name || "N/A"}
+          </h2>
+        </div>
+        <div className="text-center">
+          <button
+            className="bg-gray-300 text-white font-semibold py-2 px-6 rounded-2xl cursor-not-allowed"
+            title="التقرير النهائي"
+            disabled
+          >
+            التقرير النهائي
+          </button>
+          <p className="text-red-500 mt-2 font-medium text-sm">
+            لايوجد تقرير نهائي لعدم اكمال 40 ساعة
+          </p>
+        </div>
       </div>
 
       {/* Volunteering Opportunities Table */}
@@ -67,7 +85,7 @@ function StudentContent({ student, navigate }) {
             <tbody>
               {opportunities.length > 0 ? (
                 opportunities.map((opportunity, index) => (
-                  <tr key={index} className="border-b">
+                  <tr key={index} className="border-b hover:bg-gray-100">
                     <td className="px-4 py-2">{opportunity}</td>
                     <td className="px-4 py-2">Unknown Organization</td>{" "}
                     {/* Placeholder for organization */}
@@ -75,6 +93,17 @@ function StudentContent({ student, navigate }) {
                     {/* Placeholder for earned hours */}
                     <td className="px-4 py-2">Unknown Date</td>{" "}
                     {/* Placeholder for date */}
+                    <td className="px-4 py-3 flex justify-center items-center">
+                      <button
+                        className="shadow-lg shadow-[#23232355] bg-[#23232372] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl"
+                        style={{
+                          borderRadius: "15px",
+                          transition: "all 0.1s ease-in-out",
+                        }}
+                      >
+                        تنزيل
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
