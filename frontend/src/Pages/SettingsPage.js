@@ -78,35 +78,6 @@ const Settings = () => {
         const schoolCode = userData.schoolCode;
 
         if (schoolCode) {
-          // Locate the school document and access its 'school_officials' subcollection
-          const schoolOfficialsRef = collection(
-            db,
-            "schools",
-            schoolCode,
-            "school_officials"
-          );
-          const q = query(schoolOfficialsRef, where("email", "==", userEmail));
-          const querySnapshot = await getDocs(q);
-
-          if (!querySnapshot.empty) {
-            const userDocRef = doc(
-              db,
-              "schools",
-              schoolCode,
-              "school_officials",
-              querySnapshot.docs[0].id
-            );
-
-            try {
-              await deleteDoc(userDocRef);
-              console.log("User data deleted from Firestore.");
-            } catch (error) {
-              console.error("Error deleting user data from Firestore:", error);
-            }
-          } else {
-            console.log("No user found in school_officials.");
-          }
-
           // Delete the Firebase Authentication account
           await deleteUser(user);
           console.log("User account deleted from Firebase Authentication.");

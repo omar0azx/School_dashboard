@@ -35,7 +35,12 @@ const AllStudentsTable = () => {
       try {
         const response = await fetch(`http://localhost:5000/students/${email}`);
         const data = await response.json();
-        setStudents(Array.isArray(data) ? data : []);
+        // Filter students where isStudentRegisteredSchool is true
+        const filteredStudents = data.filter(
+          (student) => student.isStudentRegisteredScool === true
+        );
+
+        setStudents(Array.isArray(filteredStudents) ? filteredStudents : []);
       } catch (error) {
         console.error("Error fetching students:", error);
         setStudents([]);
@@ -89,7 +94,11 @@ const AllStudentsTable = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={headers.length} className="text-center py-3">
+                <td
+                  colSpan={headers.length}
+                  className="text-center py-5 font-semibold"
+                >
+                  {" "}
                   لايوجد طلاب
                 </td>
               </tr>
@@ -100,24 +109,26 @@ const AllStudentsTable = () => {
       {selectedStudent && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-40">
           <div className="bg-white p-6 rounded-xl w-[90%] max-w-md">
-            <h3 className="text-3xl font-semibold mb-8">تفاصيل الطالب</h3>
+            <h3 className="text-4xl font-extrabold mb-8">تفاصيل الطالب</h3>
+            <img
+              src={maleIcon}
+              alt="male student icon"
+              className="w-20 h-20 mx-auto mb-4"
+            />
+
             <p className="mb-4">
-              <strong>اسم الطالب:</strong> {selectedStudent.name || "N/A"}
+              <strong>{selectedStudent.name || "N/A"}</strong>
             </p>
             <p className="mb-4">
-              <strong>المستوى:</strong> {selectedStudent.level || "N/A"}
+              <strong>{selectedStudent.level || "N/A"}</strong>
             </p>
             <p className="mb-4">
-              <strong>الساعات الجديدة:</strong>{" "}
-              {selectedStudent.newHours || "N/A"}
+              <strong>{selectedStudent.phoneNumber || "N/A"}</strong>
             </p>
             <p className="mb-4">
-              <strong>الساعات القديمة:</strong>{" "}
-              {selectedStudent.oldHours || "N/A"}
+              <strong>{selectedStudent.email || "N/A"}</strong>
             </p>
-            <p className="mb-6">
-              <strong>التاريخ:</strong> {selectedStudent.date || "N/A"}
-            </p>
+
             <div className="flex flex-col items-center gap-4 mt-4">
               <button
                 onClick={goToStudentDetails}
