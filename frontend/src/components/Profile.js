@@ -241,7 +241,7 @@ const Profile = () => {
               <button
                 type="button"
                 onClick={handleSaveClick}
-                className="w-full bg-[#3f3f3f] text-white py-2 rounded-xl"
+                className="w-3/4 bg-[#3f3f3f] text-white py-2 rounded-xl transition-all duration-300 ease-in-out transform hover:bg-[#5a5a5a] hover:scale-105 hover:shadow-lg"
               >
                 حفظ
               </button>

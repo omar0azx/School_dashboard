@@ -4,7 +4,8 @@ import { showSignOutAlert } from "./sideNav.js";
 import { useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-const Nav = () => {
+const Nav = ({ setSearchQuery }) => {
+  // Receive setSearchQuery as a prop
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
@@ -22,6 +23,7 @@ const Nav = () => {
     // Perform any logout operations here
     showSignOutAlert(navigate);
     localStorage.removeItem("userEmail");
+    localStorage.removeItem("userFirstName"); // Remove first name from localStorage on logout
   };
 
   // Function to fetch user info and set only the first name
@@ -35,6 +37,7 @@ const Nav = () => {
       const fullName = data.name;
       const firstNameOnly = fullName.split(" ")[0];
       setFirstName(firstNameOnly);
+      localStorage.setItem("userFirstName", firstNameOnly); // Store first name in localStorage
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
@@ -46,7 +49,13 @@ const Nav = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUserEmail(user.email);
-        fetchUserInfo(user.email);
+        // Check if first name is in localStorage
+        const storedFirstName = localStorage.getItem("userFirstName");
+        if (storedFirstName) {
+          setFirstName(storedFirstName); // Use stored first name
+        } else {
+          fetchUserInfo(user.email); // Fetch and store if not in localStorage
+        }
       } else {
         setUserEmail(null);
         setFirstName(""); // Clear first name if not logged in
@@ -68,6 +77,11 @@ const Nav = () => {
     };
   }, [dropdownRef]);
 
+  // Check if the current page is the a prvented page from searching
+  const isPrevnetedPage =
+    location.pathname === "/NotificationPage" ||
+    location.pathname === "/SettingsPage";
+
   return (
     <nav className="grid grid-cols-3 items-center h-20 bg-white shadow-md px-6">
       <div className="flex justify-start">
@@ -85,6 +99,8 @@ const Nav = () => {
           type="text"
           placeholder="بحث..."
           className="w-full h-10 pl-10 pr-4 py-2 border border-gray-500 rounded-full focus:outline-none focus:ring focus:border-gray-300 bg-[#dfdfdf5e]"
+          onChange={(e) => setSearchQuery(e.target.value)} // Update search query on input change
+          disabled={isPrevnetedPage} // Disable the input if on Prevented pages
         />
         <svg
           className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none"
