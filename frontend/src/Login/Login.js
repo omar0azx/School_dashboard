@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth"; // Import Firebase methods
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import app from "../firebase.js";
 import emailIcon from "../assets/icon_email.svg";
 import lockIcon from "../assets/icon_lock.svg";
@@ -25,17 +32,49 @@ const Login = () => {
     }
 
     const auth = getAuth(app);
+    const db = getFirestore(app); // Initialize Firestore
+
     try {
       setLoading(true); // Set loading to true
+
+      // Step 1: Fetch the schools collection
+      const schoolsCollection = collection(db, "schools");
+      const schoolsSnapshot = await getDocs(schoolsCollection);
+
+      let emailFound = false;
+
+      // Step 2: Check each school's "school_officials" subcollection for the email
+      for (const schoolDoc of schoolsSnapshot.docs) {
+        const schoolOfficialsCollection = collection(
+          schoolDoc.ref,
+          "school_officials"
+        );
+        const officialQuery = query(
+          schoolOfficialsCollection,
+          where("email", "==", email)
+        );
+        const officialSnapshot = await getDocs(officialQuery);
+
+        if (!officialSnapshot.empty) {
+          emailFound = true;
+          break;
+        }
+      }
+
+      if (!emailFound) {
+        setError("هذا البريد الإلكتروني غير مصرح له بالدخول");
+        setLoading(false);
+        return;
+      }
+
+      // If the email is found, proceed with Firebase Authentication login
       await signInWithEmailAndPassword(auth, email, password);
       console.log("تسجيل الدخول ناجح!");
       localStorage.setItem("userEmail", email);
-      // Navigate to the HomePage where data will be loaded
       navigate("/HomePage");
     } catch (err) {
       setLoading(false); // Reset loading on error
       console.error("فشل تسجيل الدخول!", err);
-      // Improve error messages based on the error code
       if (err.code === "auth/user-not-found") {
         setError(
           "لا يوجد مستخدم مسجل بهذا البريد الإلكتروني. يرجى التحقق من بريدك الإلكتروني أو التسجيل"
