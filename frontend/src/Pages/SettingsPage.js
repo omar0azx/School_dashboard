@@ -17,6 +17,8 @@ const Settings = () => {
   const [schoolKey, setSchoolKey] = useState("");
   const [password, setPassword] = useState("");
   const [userInfo, setUserInfo] = useState({ schoolCode: "" });
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false); // Popup visibility state
+
   // const [originalUserInfo, setOriginalUserInfo] = useState(userInfo);
   // const [userEmail, setUserEmail] = useState(null);
 
@@ -60,7 +62,6 @@ const Settings = () => {
 
   const handleDeleteAccount = async () => {
     const auth = getAuth();
-    const db = getFirestore();
 
     try {
       const user = auth.currentUser;
@@ -182,12 +183,23 @@ const Settings = () => {
           حذف الحساب سيؤدي إلى فقدان جميع البيانات المرتبطة به.
         </h5>
         <button
-          onClick={handleDeleteAccount}
+          onClick={() => setShowConfirmPopup(true)} // Show confirmation popup
           className="shadow-sm bg-red-500 text-white p-1.5 rounded hover:bg-red-600 focus:outline-none"
         >
           حذف الحساب
         </button>
       </div>
+      {showConfirmPopup && (
+        <ConfirmationPopup
+          message="هل أنت متأكد أنك تريد حذف حسابك؟"
+          onConfirm={() => {
+            setShowConfirmPopup(false);
+            handleDeleteAccount();
+          }}
+          onCancel={() => setShowConfirmPopup(false)}
+        />
+      )}
+
       <hr className="mt-2 mb-4 w-100 mx-auto border-t-1 border-gray-300" />
 
       <div className="mb-4 flex items-center justify-between">
@@ -229,3 +241,26 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+
+// ConfirmationPopup Component
+const ConfirmationPopup = ({ message, onConfirm, onCancel }) => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded-xl shadow-md max-w-sm w-full text-center">
+      <p className="text-lg mb-4 text-gray-700">{message}</p>
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={onConfirm}
+          className="bg-red-500 text-white py-2 px-4 rounded-xl hover:bg-red-600 focus:outline-none"
+        >
+          تأكيد
+        </button>
+        <button
+          onClick={onCancel}
+          className="bg-gray-300 text-gray-700 py-2 px-4 rounded-xl hover:bg-gray-400 focus:outline-none"
+        >
+          إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+);

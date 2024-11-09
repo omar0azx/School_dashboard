@@ -4,6 +4,11 @@ import Loader from "../components/Loader";
 import { doc, updateDoc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import maleIcon from "../assets/avatar_male.svg";
 
+// Spinner Component
+const Spinner = () => (
+  <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+);
+
 // Alert Component
 const Alert = ({ message, type, onClose }) => {
   const alertStyles = {
@@ -24,7 +29,7 @@ const Alert = ({ message, type, onClose }) => {
   );
 };
 
-const NewStudentsTable = () => {
+const NewStudentsTable = ({ searchQuery }) => {
   const headers = [
     "",
     "اسم الطالب",
@@ -37,6 +42,7 @@ const NewStudentsTable = () => {
   const [newStudents, setNewStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+  const [loadingButtons, setLoadingButtons] = useState({});
 
   const fetchNewStudents = async () => {
     const email = localStorage.getItem("userEmail");
@@ -68,6 +74,15 @@ const NewStudentsTable = () => {
     fetchNewStudents();
   }, []);
 
+  // Filter students based on the search query
+  const filteredStudents = newStudents.filter((student) => {
+    return (
+      student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      student.phoneNumber.includes(searchQuery)
+    );
+  });
+
   const showAlert = (message, type) => {
     setAlert({ show: true, message, type });
     setTimeout(() => setAlert({ show: false, message: "", type: "" }), 3000);
@@ -88,11 +103,14 @@ const NewStudentsTable = () => {
   };
 
   const handleAccept = async (studentId) => {
+    setLoadingButtons((prev) => ({ ...prev, [studentId]: true }));
+
     const email = localStorage.getItem("userEmail");
     const schoolCode = await getUserSchoolCode(email);
 
     if (!schoolCode) {
       showAlert("رمز المدرسة غير متوفر.", "error");
+      setLoadingButtons((prev) => ({ ...prev, [studentId]: false }));
       return;
     }
 
@@ -104,15 +122,20 @@ const NewStudentsTable = () => {
     } catch (error) {
       console.error("Error accepting student:", error);
       showAlert("حدث خطأ أثناء قبول الطالب.", "error");
+    } finally {
+      setLoadingButtons((prev) => ({ ...prev, [studentId]: false }));
     }
   };
 
   const handleRefuse = async (studentId) => {
+    setLoadingButtons((prev) => ({ ...prev, [studentId]: true }));
+
     const email = localStorage.getItem("userEmail");
     const schoolCode = await getUserSchoolCode(email);
 
     if (!schoolCode) {
       showAlert("رمز المدرسة غير متوفر.", "error");
+      setLoadingButtons((prev) => ({ ...prev, [studentId]: false }));
       return;
     }
 
@@ -145,6 +168,8 @@ const NewStudentsTable = () => {
     } catch (error) {
       console.error("Error refusing student:", error);
       showAlert("حدث خطأ أثناء رفض الطالب.", "error");
+    } finally {
+      setLoadingButtons((prev) => ({ ...prev, [studentId]: false }));
     }
   };
 
@@ -171,17 +196,8 @@ const NewStudentsTable = () => {
             </tr>
           </thead>
           <tbody>
-            {newStudents.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={headers.length}
-                  className="text-center py-5 font-semibold"
-                >
-                  لايوجد طلاب
-                </td>
-              </tr>
-            ) : (
-              newStudents.map((student, rowIndex) => (
+            {filteredStudents.length > 0 ? (
+              filteredStudents.map((student, rowIndex) => (
                 <tr
                   className="bg-white text-[#232323] border-b hover:bg-gray-100"
                   key={rowIndex}
@@ -201,8 +217,9 @@ const NewStudentsTable = () => {
                         borderRadius: "15px",
                         transition: "all 0.1s ease-in-out",
                       }}
+                      disabled={loadingButtons[student.id]}
                     >
-                      قبول
+                      {loadingButtons[student.id] ? <Spinner /> : "قبول"}
                     </button>
                   </td>
                   <td className="py-3">
@@ -213,12 +230,23 @@ const NewStudentsTable = () => {
                         borderRadius: "15px",
                         transition: "all 0.1s ease-in-out",
                       }}
+                      disabled={loadingButtons[student.id]}
                     >
-                      رفض
+                      {loadingButtons[student.id] ? <Spinner /> : "رفض"}
                     </button>
                   </td>
                 </tr>
               ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={headers.length}
+                  className="text-center py-5 font-semibold"
+                >
+                  {" "}
+                  لايوجد طلاب
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

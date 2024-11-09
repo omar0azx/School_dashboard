@@ -4,7 +4,7 @@ import Loader from "../components/Loader.js"; // Import the Loader component
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const AllStudentsTable = () => {
+const AllStudentsTable = ({ searchQuery }) => {
   const navigate = useNavigate();
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [students, setStudents] = useState([]);
@@ -61,7 +61,12 @@ const AllStudentsTable = () => {
   if (loading) {
     return <Loader />;
   }
-
+  const filteredStudents = students.filter(
+    (student) =>
+      student.name.includes(searchQuery) ||
+      student.email.includes(searchQuery) ||
+      student.phoneNumber.includes(searchQuery)
+  );
   return (
     <div className="my-5 mx-20 bg-white px-4 pt-3 pb-4 rounded-3xl border border-gray-200 flex-1">
       <div className="max-h-64 lg:max-h-[60vh] overflow-y-auto">
@@ -76,8 +81,8 @@ const AllStudentsTable = () => {
             </tr>
           </thead>
           <tbody>
-            {students.length > 0 ? (
-              students.map((student, index) => (
+            {filteredStudents.length > 0 ? (
+              filteredStudents.map((student, index) => (
                 <tr
                   key={index}
                   className="bg-white text-[#232323] border-b hover:bg-gray-100"
@@ -108,7 +113,13 @@ const AllStudentsTable = () => {
       </div>
       {selectedStudent && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-40">
-          <div className="bg-white p-6 rounded-xl w-[90%] max-w-md">
+          <div className="relative bg-white p-6 rounded-xl w-[90%] max-w-md">
+            <button
+              className="absolute top-2 right-4 text-gray-500 hover:text-red-500"
+              onClick={closeModal}
+            >
+              ✕
+            </button>
             <h3 className="text-4xl font-extrabold mb-8">تفاصيل الطالب</h3>
             <img
               src={maleIcon}
@@ -132,15 +143,9 @@ const AllStudentsTable = () => {
             <div className="flex flex-col items-center gap-4 mt-4">
               <button
                 onClick={goToStudentDetails}
-                className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded-xl"
+                className="w-3/4 bg-[#3BCAD3] text-white py-2 rounded-xl transition-all duration-300 ease-in-out transform hover:bg-[#3bc9d3ba] hover:scale-105 hover:shadow-lg"
               >
                 إظهار السجل التطوعي
-              </button>
-              <button
-                onClick={closeModal}
-                className="shadow-lg shadow-[#d33b3b5e] bg-[#d33b3b] hover:bg-[#d33b3be5] text-white font-bold py-2 px-6 rounded-xl"
-              >
-                إغلاق
               </button>
             </div>
           </div>
