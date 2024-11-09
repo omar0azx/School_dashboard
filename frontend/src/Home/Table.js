@@ -49,6 +49,7 @@ const Table = () => {
       <h2 className="text-[20px] font-semibold font-cairo text-right pr-5">
         أبرز الاحصائيات:
       </h2>
+      <hr className="mt-3 w-11/12 mx-auto border-t-2 border-gray-300" />
       <Cards />
 
       {activeHeader === "inbox" && (
@@ -64,6 +65,14 @@ const Table = () => {
           </button>
         </div>
       )}
+      {activeHeader === "reports" && (
+        <div className="flex mt-1 justify-between">
+          <h2 className="text-[20px] font-semibold font-cairo text-right pr-5">
+            التحقق من التقارير الجديدة للطلاب:
+          </h2>
+        </div>
+      )}
+      <hr className="mt-3 mb-4 w-11/12 mx-auto border-t-2 border-gray-300" />
       {activeHeader === "inbox" && <MainTable ref={tableRef} />}
       {activeHeader === "reports" && <ReportsTable />}
     </div>

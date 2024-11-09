@@ -46,11 +46,7 @@ function StudentPage() {
               الطلاب الجُدد{" "}
             </h2>
           </div>
-          {/* <div className="flex mt-6 justify-between">
-            <h2 className="text-[20px] font-semibold font-cairo text-right pr-5">
-              الطُلاب الجُدد المُسجلين في المنصة:
-            </h2>
-          </div> */}
+
           <div className="">
             {activeHeader === "AllStudents" && (
               <div className="flex mt-1 justify-between">

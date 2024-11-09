@@ -35,9 +35,9 @@ const AllStudentsTable = () => {
       try {
         const response = await fetch(`http://localhost:5000/students/${email}`);
         const data = await response.json();
-        // Filter students where isStudentRegisteredSchool is true
+        // Filter students where isStudentAccepted is 1 = true
         const filteredStudents = data.filter(
-          (student) => student.isStudentRegisteredScool === true
+          (student) => student.isStudentAccepted === 1
         );
 
         setStudents(Array.isArray(filteredStudents) ? filteredStudents : []);

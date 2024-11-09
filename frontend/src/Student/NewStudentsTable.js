@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import Loader from "../components/Loader";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import maleIcon from "../assets/avatar_male.svg";
 
 // Alert Component
@@ -51,7 +51,7 @@ const NewStudentsTable = () => {
       const response = await fetch(`http://localhost:5000/students/${email}`);
       const data = await response.json();
       const unregisteredStudents = data.filter(
-        (student) => student.isStudentRegisteredScool === false
+        (student) => student.isStudentAccepted === 0
       );
       setNewStudents(
         Array.isArray(unregisteredStudents) ? unregisteredStudents : []
@@ -98,7 +98,7 @@ const NewStudentsTable = () => {
 
     try {
       const studentRef = doc(db, "schools", schoolCode, "students", studentId);
-      await updateDoc(studentRef, { isStudentRegisteredScool: true });
+      await updateDoc(studentRef, { isStudentAccepted: 1 });
       fetchNewStudents();
       showAlert("تم قبول الطالب بنجاح!", "success");
     } catch (error) {
@@ -118,7 +118,28 @@ const NewStudentsTable = () => {
 
     try {
       const studentRef = doc(db, "schools", schoolCode, "students", studentId);
-      // await deleteDoc(studentRef);
+
+      // Step 1: Get the student's data
+      const studentDoc = await getDoc(studentRef);
+      await updateDoc(studentRef, { isStudentAccepted: -1 });
+      if (!studentDoc.exists()) {
+        showAlert("الطالب غير موجود.", "error");
+        return;
+      }
+      const studentData = studentDoc.data();
+
+      // Step 2: Add the student to the UnapprovedEntities collection
+      const unapprovedRef = doc(db, "UnapprovedEntities", studentId); // Use the same studentId for consistency
+      await setDoc(unapprovedRef, {
+        ...studentData,
+        schoolCode,
+        status: "refused",
+      });
+
+      // Step 3: Delete the student from the original collection
+      await deleteDoc(studentRef);
+
+      // Refresh the student list
       fetchNewStudents();
       showAlert("تم رفض الطالب بنجاح!", "success");
     } catch (error) {
