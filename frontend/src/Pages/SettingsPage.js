@@ -24,9 +24,15 @@ const Settings = () => {
   const [userInfo, setUserInfo] = useState({ schoolCode: "" });
   const [showConfirmPopup, setShowConfirmPopup] = useState(false); // Popup visibility state
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+  const [isSchoolKeyLoading, setIsSchoolKeyLoading] = useState(false); // School key loading state
+  const [isPasswordLoading, setIsPasswordLoading] = useState(false); // Password loading state
 
-  // const [originalUserInfo, setOriginalUserInfo] = useState(userInfo);
-  // const [userEmail, setUserEmail] = useState(null);
+  // Spinner Component
+  const Spinner = () => (
+    <div className="flex justify-center items-center">
+      <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+    </div>
+  );
 
   const navigate = useNavigate();
   const fetchUserInfo = async (email) => {
@@ -60,6 +66,7 @@ const Settings = () => {
       showAlert("الرجاء إدخال رمز المدرسة الجديد.", "error");
       return;
     }
+    setIsSchoolKeyLoading(true);
 
     try {
       const response = await fetch("http://localhost:5000/changeSchoolKey", {
@@ -82,7 +89,7 @@ const Settings = () => {
       console.error("Error changing school key:", error);
       showAlert("حدث خطأ أثناء تغيير رمز المدرسة. حاول مرة أخرى.", "error");
     }
-
+    setIsSchoolKeyLoading(false);
     setSchoolKey("");
     setIsSchoolKeyVisible(false);
   };
@@ -92,6 +99,7 @@ const Settings = () => {
     const user = auth.currentUser;
 
     if (user && password) {
+      setIsPasswordLoading(true);
       try {
         await updatePassword(user, password); // Update the password
         console.log("Password updated successfully");
@@ -102,6 +110,7 @@ const Settings = () => {
         console.error("Error updating password:", error);
         showAlert("حدث خطأ أثناء تحديث كلمة المرور. حاول مرة أخرى.", "error");
       }
+      setIsPasswordLoading(false);
     } else {
       showAlert("من فضلك، أدخل كلمة مرور جديدة.", "error");
     }
@@ -189,7 +198,7 @@ const Settings = () => {
               onClick={handleChangeSchoolKey}
               className="w-1/5 bg-[#3BCAD3] text-white p-2 mt-3 rounded-xl transition-all duration-300 ease-in-out transform hover:bg-[#3bc9d3ba] hover:scale-105 hover:shadow-lg"
             >
-              حفظ الرمز الجديد
+              {isSchoolKeyLoading ? <Spinner /> : "حفظ الرمز الجديد"}
             </button>
           </div>
         )}
@@ -229,7 +238,7 @@ const Settings = () => {
               onClick={handleChangePassword}
               className="w-1/5 bg-[#3BCAD3] text-white p-2 mt-3 rounded-xl transition-all duration-300 ease-in-out transform hover:bg-[#3bc9d3ba] hover:scale-105 hover:shadow-lg"
             >
-              حفظ كلمة المرور
+              {isPasswordLoading ? <Spinner /> : "حفظ كلمة المرور"}
             </button>
           </div>
         )}

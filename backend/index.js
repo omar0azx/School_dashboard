@@ -265,7 +265,7 @@ app.post("/changeSchoolKey", async (req, res) => {
     // Check if the new school code exists
     const newSchoolDoc = await schoolsRef.doc(newSchoolCode).get();
     if (!newSchoolDoc.exists) {
-      return res.status(404).json({ error: "School code not found." });
+      return res.status(404).json({ error: "رمز المدرسة غير موجود" });
     }
 
     // Find the current school of the user
