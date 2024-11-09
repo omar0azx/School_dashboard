@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import SettingsSideNav from "../components/sideNav.js";
+import Alert from "../components/Alert"; // Import the new Alert component
+
 import SettingsNav from "../components/nav.js";
 import { showSignOutAlert } from "../components/sideNav.js";
 import { useNavigate } from "react-router-dom";
-import { getAuth, onAuthStateChanged, deleteUser } from "firebase/auth";
-import { getFirestore, doc, deleteDoc } from "firebase/firestore";
-import { getDocs, query, where, collection } from "firebase/firestore";
+import {
+  getAuth,
+  onAuthStateChanged,
+  deleteUser,
+  updatePassword,
+} from "firebase/auth";
 
 import showPasswordIcon from "../assets/eye_closed.svg";
 import hidePasswordIcon from "../assets/eye_opened.svg";
@@ -18,6 +23,7 @@ const Settings = () => {
   const [password, setPassword] = useState("");
   const [userInfo, setUserInfo] = useState({ schoolCode: "" });
   const [showConfirmPopup, setShowConfirmPopup] = useState(false); // Popup visibility state
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
   // const [originalUserInfo, setOriginalUserInfo] = useState(userInfo);
   // const [userEmail, setUserEmail] = useState(null);
@@ -47,17 +53,58 @@ const Settings = () => {
     });
   }, []);
 
-  const handleChangeSchoolKey = () => {
-    console.log("New School Key:", schoolKey);
+  const handleChangeSchoolKey = async () => {
+    const newSchoolCode = schoolKey.trim();
+
+    if (!newSchoolCode) {
+      showAlert("الرجاء إدخال رمز المدرسة الجديد.", "error");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/changeSchoolKey", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: userInfo.email, newSchoolCode }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        showAlert("تم تغيير رمز المدرسة بنجاح!", "success");
+        setUserInfo((prev) => ({ ...prev, schoolCode: newSchoolCode }));
+      } else {
+        showAlert(result.error || "حدث خطأ أثناء تغيير رمز المدرسة.", "error");
+      }
+    } catch (error) {
+      console.error("Error changing school key:", error);
+      showAlert("حدث خطأ أثناء تغيير رمز المدرسة. حاول مرة أخرى.", "error");
+    }
+
     setSchoolKey("");
     setIsSchoolKeyVisible(false);
   };
 
-  const handleChangePassword = () => {
-    // Handle logic for changing the password
-    console.log("New Password:", password);
-    setPassword("");
-    setIsPasswordVisible(false);
+  const handleChangePassword = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (user && password) {
+      try {
+        await updatePassword(user, password); // Update the password
+        console.log("Password updated successfully");
+        showAlert("تم تحديث كلمة المرور بنجاح!", "success");
+        setPassword(""); // Clear password field after successful change
+        setIsPasswordVisible(false); // Close the password change section
+      } catch (error) {
+        console.error("Error updating password:", error);
+        showAlert("حدث خطأ أثناء تحديث كلمة المرور. حاول مرة أخرى.", "error");
+      }
+    } else {
+      showAlert("من فضلك، أدخل كلمة مرور جديدة.", "error");
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -105,9 +152,19 @@ const Settings = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
+  const showAlert = (message, type) => {
+    setAlert({ show: true, message, type });
+    setTimeout(() => setAlert({ show: false, message: "", type: "" }), 4000);
+  };
   return (
     <div className="p-4 m-20 mt-5 font-sans bg-[#ffffff] rounded-xl">
+      {alert.show && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert({ show: false })}
+        />
+      )}
       <div className="mb-6 border rounded-xl bg-white shadow-sm">
         <button
           onClick={() => setIsSchoolKeyVisible(!isSchoolKeyVisible)}
@@ -130,7 +187,7 @@ const Settings = () => {
             />
             <button
               onClick={handleChangeSchoolKey}
-              className="mt-2 w-1/4 shadow-lg shadow-cyan-500/50  bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold p-2 rounded-3xl"
+              className="w-1/5 bg-[#3BCAD3] text-white p-2 mt-3 rounded-xl transition-all duration-300 ease-in-out transform hover:bg-[#3bc9d3ba] hover:scale-105 hover:shadow-lg"
             >
               حفظ الرمز الجديد
             </button>
@@ -170,7 +227,7 @@ const Settings = () => {
             </div>
             <button
               onClick={handleChangePassword}
-              className="mt-2 w-1/4 shadow-lg shadow-cyan-500/50  bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold p-2 rounded-3xl"
+              className="w-1/5 bg-[#3BCAD3] text-white p-2 mt-3 rounded-xl transition-all duration-300 ease-in-out transform hover:bg-[#3bc9d3ba] hover:scale-105 hover:shadow-lg"
             >
               حفظ كلمة المرور
             </button>

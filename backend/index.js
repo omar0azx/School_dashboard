@@ -255,6 +255,56 @@ app.get("/students/:email", async (req, res) => {
   }
 });
 
+// Endpoint for changing the school key
+app.post("/changeSchoolKey", async (req, res) => {
+  const { email, newSchoolCode } = req.body;
+
+  try {
+    const schoolsRef = db.collection("schools");
+
+    // Check if the new school code exists
+    const newSchoolDoc = await schoolsRef.doc(newSchoolCode).get();
+    if (!newSchoolDoc.exists) {
+      return res.status(404).json({ error: "School code not found." });
+    }
+
+    // Find the current school of the user
+    const querySnapshot = await schoolsRef.get();
+    let userDocRef = null;
+
+    for (const doc of querySnapshot.docs) {
+      const schoolOfficialsRef = doc.ref.collection("school_officials");
+      const userSnapshot = await schoolOfficialsRef
+        .where("email", "==", email)
+        .get();
+
+      if (!userSnapshot.empty) {
+        userDocRef = userSnapshot.docs[0].ref;
+        break;
+      }
+    }
+
+    if (!userDocRef) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Get user data and add to new school's school_officials subcollection
+    const userData = (await userDocRef.get()).data();
+    await schoolsRef
+      .doc(newSchoolCode)
+      .collection("school_officials")
+      .add(userData);
+
+    // Delete user from old school_officials collection
+    await userDocRef.delete();
+
+    res.status(200).json({ message: "School key updated successfully." });
+  } catch (error) {
+    console.error("Error changing school key:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

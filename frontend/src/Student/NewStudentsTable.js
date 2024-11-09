@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import Loader from "../components/Loader";
+import Alert from "../components/Alert";
 import { doc, updateDoc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import maleIcon from "../assets/avatar_male.svg";
 
@@ -8,26 +9,6 @@ import maleIcon from "../assets/avatar_male.svg";
 const Spinner = () => (
   <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
 );
-
-// Alert Component
-const Alert = ({ message, type, onClose }) => {
-  const alertStyles = {
-    success: "bg-[#abff8f] text-[#528741]",
-    error: "bg-[#ff7979] text-[#7D2B2B]",
-  };
-
-  return (
-    <div
-      className={`flex justify-between items-center p-2 rounded-xl shadow ${alertStyles[type]} fixed down-4 left-4 max-w-[200px] z-50`}
-      style={{ minWidth: "150px" }}
-    >
-      <span className="text-sm">{message}</span>
-      <button onClick={onClose} className="font-bold text-lg mx-2">
-        ×
-      </button>
-    </div>
-  );
-};
 
 const NewStudentsTable = ({ searchQuery }) => {
   const headers = [
