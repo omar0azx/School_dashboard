@@ -156,6 +156,8 @@ const Settings = () => {
   const handleLogout = () => {
     // Handle logout logic
     showSignOutAlert(navigate);
+    localStorage.removeItem("userEmail"); // Remove email from localStorage on logout
+    localStorage.removeItem("userFirstName"); // Remove first name from localStorage on logout
   };
 
   const togglePasswordVisibility = () => {

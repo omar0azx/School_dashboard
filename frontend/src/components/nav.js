@@ -22,7 +22,7 @@ const Nav = ({ setSearchQuery }) => {
   const handleLogout = () => {
     // Perform any logout operations here
     showSignOutAlert(navigate);
-    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userEmail"); // Remove email from localStorage on logout
     localStorage.removeItem("userFirstName"); // Remove first name from localStorage on logout
   };
 
