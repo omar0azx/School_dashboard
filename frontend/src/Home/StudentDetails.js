@@ -3,6 +3,14 @@ import Nav from "../components/nav.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa"; // Import back icon
 import maleIcon from "../assets/avatar_male.svg";
+import { useEffect, useState } from "react";
+import {
+  collectionGroup,
+  getFirestore,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore"; // Import Firestore methods
 
 const StudentDetails = () => {
   const location = useLocation();
@@ -29,8 +37,34 @@ const StudentDetails = () => {
 export default StudentDetails;
 
 function StudentContent({ student, navigate }) {
-  // Extract opportunities from the student object
-  const opportunities = student.opportunities || []; // Get opportunities or default to an empty array
+  const [opportunities, setOpportunities] = useState([]);
+  const db = getFirestore(); // Initialize Firestore
+
+  useEffect(() => {
+    // Function to fetch opportunities with status "finished"
+    const fetchOpportunities = async () => {
+      if (student.opportunities?.length > 0) {
+        try {
+          // Query for opportunities with a finished status
+          const opportunitiesQuery = query(
+            collectionGroup(db, "opportunities"),
+            where("id", "in", student.opportunities), // Match only the student-specific opportunities
+            where("status", "==", "finished") // Filter to only show finished opportunities
+          );
+          const querySnapshot = await getDocs(opportunitiesQuery);
+          const finishedOpportunities = querySnapshot.docs.map((doc) =>
+            doc.data()
+          );
+
+          setOpportunities(finishedOpportunities); // Update state with finished opportunities
+        } catch (error) {
+          console.error("Error fetching opportunities:", error);
+        }
+      }
+    };
+
+    fetchOpportunities();
+  }, [student.opportunities, db]);
 
   return (
     <div className="p-8 space-y-4">
@@ -41,14 +75,14 @@ function StudentContent({ student, navigate }) {
           className="flex items-center text-[#3BCAD3] text-xl py-2 px-4 rounded-2xl focus:outline-none 
              hover:bg-[#3BCAD3] hover:text-white hover:shadow-lg transition-all duration-200"
         >
-          <FaArrowRight className="mx-2" /> {/* Back Icon */}
+          <FaArrowRight className="mx-2" />
           <span>العودة</span>
         </button>
       </div>
 
       <hr className="mt-2 mb-6 w-11/12 mx-auto border-t-2 border-gray-300" />
 
-      {/* Student Name and Report Button in Row */}
+      {/* Student Name and Report Button */}
       <div className="flex justify-between items-center mt-4 mx-20">
         <div className="flex items-center mr-4">
           <img src={maleIcon} alt="male student icon" />
@@ -86,13 +120,14 @@ function StudentContent({ student, navigate }) {
               {opportunities.length > 0 ? (
                 opportunities.map((opportunity, index) => (
                   <tr key={index} className="border-b hover:bg-gray-100">
-                    <td className="px-4 py-2">{opportunity}</td>
-                    <td className="px-4 py-2">Unknown Organization</td>{" "}
-                    {/* Placeholder for organization */}
-                    <td className="px-4 py-2">0</td>{" "}
-                    {/* Placeholder for earned hours */}
-                    <td className="px-4 py-2">Unknown Date</td>{" "}
-                    {/* Placeholder for date */}
+                    <td className="px-4 py-2">{opportunity.name || "N/A"}</td>
+                    <td className="px-4 py-2">
+                      {opportunity.organizationName || "Unknown Organization"}
+                    </td>
+                    <td className="px-4 py-2">{opportunity.hour || 0}</td>
+                    <td className="px-4 py-2">
+                      {opportunity.date || "Unknown Date"}
+                    </td>
                     <td className="px-4 py-3 flex justify-center items-center">
                       <button
                         className="shadow-lg shadow-[#23232355] bg-[#23232372] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl"
@@ -109,7 +144,7 @@ function StudentContent({ student, navigate }) {
               ) : (
                 <tr>
                   <td colSpan={4} className="text-center py-3">
-                    لا توجد فرص تطوعية
+                    لا توجد فرص تطوعية منتهية
                   </td>
                 </tr>
               )}

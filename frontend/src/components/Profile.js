@@ -76,6 +76,9 @@ const Profile = () => {
       if (!response.ok) {
         throw new Error("Failed to update profile");
       }
+      const fullName = userInfo.name;
+      const firstNameOnly = fullName.split(" ")[0];
+      localStorage.setItem("userFirstName", firstNameOnly); // Store first name in localStorage
 
       // Optionally, fetch updated user info
       fetchUserInfo(userEmail);
