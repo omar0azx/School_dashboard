@@ -11,6 +11,8 @@ import {
   where,
   getDocs,
 } from "firebase/firestore"; // Import Firestore methods
+import { getStorage, ref, getDownloadURL } from "firebase/storage"; // Import Storage functions
+import { generatePDF } from "../components/generatePDF"; // Correct path to generatePDF
 
 const StudentDetails = () => {
   const location = useLocation();
@@ -35,28 +37,45 @@ const StudentDetails = () => {
   );
 };
 export default StudentDetails;
-
 function StudentContent({ student, navigate }) {
   const [opportunities, setOpportunities] = useState([]);
-  const db = getFirestore(); // Initialize Firestore
+  const [imageUrls, setImageUrls] = useState({}); // State to store organization image URLs
+  const db = getFirestore(); // Firestore instance
+  const storage = getStorage(); // Firebase storage instance
 
   useEffect(() => {
-    // Function to fetch opportunities with status "finished"
+    // Function to fetch opportunities and their organization images
     const fetchOpportunities = async () => {
       if (student.opportunities?.length > 0) {
         try {
-          // Query for opportunities with a finished status
+          // Query to fetch opportunities based on student ID and "finished" status
           const opportunitiesQuery = query(
             collectionGroup(db, "opportunities"),
-            where("id", "in", student.opportunities), // Match only the student-specific opportunities
-            where("status", "==", "finished") // Filter to only show finished opportunities
+            where("id", "in", student.opportunities), // Get student's opportunities
+            where("status", "==", "finished")
           );
+
           const querySnapshot = await getDocs(opportunitiesQuery);
-          const finishedOpportunities = querySnapshot.docs.map((doc) =>
+          const fetchedOpportunities = querySnapshot.docs.map((doc) =>
             doc.data()
           );
 
-          setOpportunities(finishedOpportunities); // Update state with finished opportunities
+          // Get organization image links and fetch the images from Firebase storage
+          const imageUrls = {};
+          for (const opportunity of fetchedOpportunities) {
+            if (opportunity.organizationImageLink) {
+              const imageRef = ref(storage, opportunity.organizationImageLink);
+              try {
+                const url = await getDownloadURL(imageRef);
+                imageUrls[opportunity.organizationName] = url; // Map organization name to image URL
+              } catch (error) {
+                console.error("Error fetching image URL:", error);
+              }
+            }
+          }
+
+          setImageUrls(imageUrls); // Store image URLs in state
+          setOpportunities(fetchedOpportunities); // Update opportunities state
         } catch (error) {
           console.error("Error fetching opportunities:", error);
         }
@@ -64,11 +83,11 @@ function StudentContent({ student, navigate }) {
     };
 
     fetchOpportunities();
-  }, [student.opportunities, db]);
+  }, [student.opportunities, db, storage]);
 
   return (
     <div className="p-8 space-y-4">
-      {/* Back Button with Icon */}
+      {/* Back Button */}
       <div className="flex justify-start">
         <button
           onClick={() => navigate("/StudentPage")}
@@ -110,6 +129,7 @@ function StudentContent({ student, navigate }) {
           <table className="w-full text-[#718EBF] bg-white">
             <thead className="border-b-2 border-gray-300">
               <tr>
+                <th className=""></th> {/* Image column header */}
                 <th className="px-4 py-2">اسم الفرصة</th>
                 <th className="px-4 py-2">الجهة</th>
                 <th className="px-4 py-2">الساعات المكتسبة</th>
@@ -120,6 +140,18 @@ function StudentContent({ student, navigate }) {
               {opportunities.length > 0 ? (
                 opportunities.map((opportunity, index) => (
                   <tr key={index} className="border-b hover:bg-gray-100">
+                    {/* Displaying the organization image in the first column */}
+                    <td className="">
+                      {imageUrls[opportunity.organizationName] ? (
+                        <img
+                          src={imageUrls[opportunity.organizationName]}
+                          alt={opportunity.organizationName}
+                          className="w-12 h-12 object-cover rounded-full"
+                        />
+                      ) : (
+                        <span>Image not available</span>
+                      )}
+                    </td>
                     <td className="px-4 py-2">{opportunity.name || "N/A"}</td>
                     <td className="px-4 py-2">
                       {opportunity.organizationName || "Unknown Organization"}
@@ -130,6 +162,7 @@ function StudentContent({ student, navigate }) {
                     </td>
                     <td className="px-4 py-3 flex justify-center items-center">
                       <button
+                        onClick={() => generatePDF(opportunity, student)} // Call generatePDF here
                         className="shadow-lg shadow-[#23232355] bg-[#23232372] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl"
                         style={{
                           borderRadius: "15px",
@@ -143,7 +176,7 @@ function StudentContent({ student, navigate }) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="text-center py-3">
+                  <td colSpan={6} className="text-center py-3">
                     لا توجد فرص تطوعية منتهية
                   </td>
                 </tr>
