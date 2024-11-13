@@ -1,5 +1,6 @@
 import SideNav from "../components/sideNav.js";
 import Nav from "../components/nav.js";
+import Loader from "../components/Loader";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa"; // Import back icon
 import maleIcon from "../assets/avatar_male.svg";
@@ -12,7 +13,7 @@ import {
   getDocs,
 } from "firebase/firestore"; // Import Firestore methods
 import { getStorage, ref, getDownloadURL } from "firebase/storage"; // Import Storage functions
-import { generatePDF } from "../components/generatePDF"; // Correct path to generatePDF
+import { generateReport } from "../components/generateReport.js"; // Correct path to generatePDF
 
 const StudentDetails = () => {
   const location = useLocation();
@@ -42,16 +43,15 @@ function StudentContent({ student, navigate }) {
   const [imageUrls, setImageUrls] = useState({}); // State to store organization image URLs
   const db = getFirestore(); // Firestore instance
   const storage = getStorage(); // Firebase storage instance
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
-    // Function to fetch opportunities and their organization images
     const fetchOpportunities = async () => {
       if (student.opportunities?.length > 0) {
         try {
-          // Query to fetch opportunities based on student ID and "finished" status
           const opportunitiesQuery = query(
             collectionGroup(db, "opportunities"),
-            where("id", "in", student.opportunities), // Get student's opportunities
+            where("id", "in", student.opportunities),
             where("status", "==", "finished")
           );
 
@@ -60,25 +60,32 @@ function StudentContent({ student, navigate }) {
             doc.data()
           );
 
-          // Get organization image links and fetch the images from Firebase storage
           const imageUrls = {};
           for (const opportunity of fetchedOpportunities) {
-            if (opportunity.organizationImageLink) {
-              const imageRef = ref(storage, opportunity.organizationImageLink);
+            if (opportunity.organizationID) {
+              const imageRef = ref(
+                storage,
+                `organisations_icons/${opportunity.organizationID}.jpg`
+              );
+
               try {
                 const url = await getDownloadURL(imageRef);
-                imageUrls[opportunity.organizationName] = url; // Map organization name to image URL
+                imageUrls[opportunity.organizationID] = url;
               } catch (error) {
                 console.error("Error fetching image URL:", error);
               }
             }
           }
 
-          setImageUrls(imageUrls); // Store image URLs in state
-          setOpportunities(fetchedOpportunities); // Update opportunities state
+          setImageUrls(imageUrls);
+          setOpportunities(fetchedOpportunities);
         } catch (error) {
           console.error("Error fetching opportunities:", error);
+        } finally {
+          setLoading(false); // Data has been fetched, stop loading
         }
+      } else {
+        setLoading(false); // No opportunities, stop loading
       }
     };
 
@@ -124,67 +131,71 @@ function StudentContent({ student, navigate }) {
       </div>
 
       {/* Volunteering Opportunities Table */}
-      <div className="mt-4 mx-20 bg-white px-4 pt-3 pb-4 rounded-3xl border border-gray-200">
-        <div className="max-h-64 lg:max-h-[75vh] overflow-y-auto">
-          <table className="w-full text-[#718EBF] bg-white">
-            <thead className="border-b-2 border-gray-300">
-              <tr>
-                <th className=""></th> {/* Image column header */}
-                <th className="px-4 py-2">اسم الفرصة</th>
-                <th className="px-4 py-2">الجهة</th>
-                <th className="px-4 py-2">الساعات المكتسبة</th>
-                <th className="px-4 py-2">التاريخ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {opportunities.length > 0 ? (
-                opportunities.map((opportunity, index) => (
-                  <tr key={index} className="border-b hover:bg-gray-100">
-                    {/* Displaying the organization image in the first column */}
-                    <td className="">
-                      {imageUrls[opportunity.organizationName] ? (
-                        <img
-                          src={imageUrls[opportunity.organizationName]}
-                          alt={opportunity.organizationName}
-                          className="w-12 h-12 object-cover rounded-full"
-                        />
-                      ) : (
-                        <span>Image not available</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2">{opportunity.name || "N/A"}</td>
-                    <td className="px-4 py-2">
-                      {opportunity.organizationName || "Unknown Organization"}
-                    </td>
-                    <td className="px-4 py-2">{opportunity.hour || 0}</td>
-                    <td className="px-4 py-2">
-                      {opportunity.date || "Unknown Date"}
-                    </td>
-                    <td className="px-4 py-3 flex justify-center items-center">
-                      <button
-                        onClick={() => generatePDF(opportunity, student)} // Call generatePDF here
-                        className="shadow-lg shadow-[#23232355] bg-[#23232372] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl"
-                        style={{
-                          borderRadius: "15px",
-                          transition: "all 0.1s ease-in-out",
-                        }}
-                      >
-                        تنزيل
-                      </button>
+      {/* Conditionally render loader or table */}
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className="mt-4 mx-20 bg-white px-4 pt-3 pb-4 rounded-3xl border border-gray-200">
+          <div className="max-h-64 lg:max-h-[75vh] overflow-y-auto">
+            <table className="w-full text-[#718EBF] bg-white">
+              <thead className="border-b-2 border-gray-300">
+                <tr>
+                  <th className=""></th>
+                  <th className="px-4 py-2">اسم الفرصة</th>
+                  <th className="px-4 py-2">الجهة</th>
+                  <th className="px-4 py-2">الساعات المكتسبة</th>
+                  <th className="px-4 py-2">التاريخ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {opportunities.length > 0 ? (
+                  opportunities.map((opportunity, index) => (
+                    <tr key={index} className="border-b hover:bg-gray-100">
+                      <td className="">
+                        {imageUrls[opportunity.organizationID] ? (
+                          <img
+                            src={imageUrls[opportunity.organizationID]}
+                            alt={opportunity.organizationName}
+                            className="w-12 h-12 object-cover rounded-full"
+                          />
+                        ) : (
+                          <span>Image not available</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2">{opportunity.name || "N/A"}</td>
+                      <td className="px-4 py-2">
+                        {opportunity.organizationName || "Unknown Organization"}
+                      </td>
+                      <td className="px-4 py-2">{opportunity.hour || 0}</td>
+                      <td className="px-4 py-2">
+                        {opportunity.date || "Unknown Date"}
+                      </td>
+                      <td className="px-4 py-3 flex justify-center items-center">
+                        <button
+                          onClick={() => generateReport(opportunity, student)}
+                          className="shadow-lg shadow-[#23232355] bg-[#23232372] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl"
+                          style={{
+                            borderRadius: "15px",
+                            transition: "all 0.1s ease-in-out",
+                          }}
+                        >
+                          تنزيل
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="text-center py-3">
+                      لا توجد فرص تطوعية منتهية
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="text-center py-3">
-                    لا توجد فرص تطوعية منتهية
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
