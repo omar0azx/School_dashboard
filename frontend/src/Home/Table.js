@@ -1,9 +1,11 @@
 import React from "react";
 import * as XLSX from "xlsx"; // Import xlsx
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import Cards from "./cards.js";
 import maleIcon from "../assets/avatar_male.svg";
+import { db } from "../firebase.js";
+import { doc, updateDoc } from "firebase/firestore";
+import { FaSyncAlt } from "react-icons/fa"; // Import the refresh icon
 
 const Table = () => {
   const [activeHeader, setActiveHeader] = useState("inbox");
@@ -22,6 +24,10 @@ const Table = () => {
     XLSX.writeFile(workbook, "Students_Data.xlsx");
   };
 
+  // Refresh table function
+  const refreshTable = () => {
+    tableRef.current.refreshData(); // Call the refresh method on MainTable
+  };
   return (
     <div className="my-3 2k:w-[95%] fullhd:w-[95%]">
       <div className="flex justify-center items-center gap-5">
@@ -62,6 +68,13 @@ const Table = () => {
             onClick={handleDownloadExcel} // Attach download function
           >
             تنزيل ملف الاكسل
+          </button>
+          {/* Refresh button */}
+          <button
+            className="ml-4 shadow-lg shadow-[#23232355] bg-[#232323] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl"
+            onClick={refreshTable} // Attach refresh function
+          >
+            <FaSyncAlt className="inline-block mr-2 text-lg" /> تحديث
           </button>
         </div>
       )}
@@ -167,82 +180,50 @@ function ReportsTable() {
 }
 
 const MainTable = React.forwardRef((_, ref) => {
-  // State to manage table rows
-  const [rows, setRows] = useState([
-    {
-      name: "نواف أحمد",
-      level: "الثالث",
-      newHours: "10",
-      oldHours: "20",
-      date: "10/10/2021",
-      isChecked: false,
-    },
-    {
-      name: "أحمد علي",
-      level: "الثاني",
-      newHours: "8",
-      oldHours: "18",
-      date: "11/11/2021",
-      isChecked: false,
-    },
-    {
-      name: "سارة محمد",
-      level: "الرابع",
-      newHours: "12",
-      oldHours: "24",
-      date: "12/12/2021",
-      isChecked: false,
-    },
-    {
-      name: "علي سعيد",
-      level: "الأول",
-      newHours: "6",
-      oldHours: "14",
-      date: "01/01/2022",
-      isChecked: false,
-    },
-    {
-      name: "خالد سالم",
-      level: "الثالث",
-      newHours: "11",
-      oldHours: "22",
-      date: "02/02/2022",
-      isChecked: false,
-    },
-    {
-      name: "فاطمة حسن",
-      level: "الثاني",
-      newHours: "9",
-      oldHours: "19",
-      date: "03/03/2022",
-      isChecked: false,
-    },
-    {
-      name: "فاطمة حسن",
-      level: "الثاني",
-      newHours: "9",
-      oldHours: "19",
-      date: "03/03/2022",
-      isChecked: false,
-    },
-    {
-      name: "فاطمة حسن",
-      level: "الثاني",
-      newHours: "9",
-      oldHours: "19",
-      date: "03/03/2022",
-      isChecked: false,
-    },
-    {
-      name: "فاطمة حسن",
-      level: "الثاني",
-      newHours: "9",
-      oldHours: "19",
-      date: "03/03/2022",
-      isChecked: false,
-    },
-    // ... more rows as needed
-  ]);
+  const [rows, setRows] = useState([]);
+  const [setCheckboxStates, setCheckboxState] = useState([]);
+  const loggedInUserEmail = localStorage.getItem("userEmail");
+
+  // Declare the fetchData function first
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/students/${loggedInUserEmail}`
+      );
+      const data = await response.json();
+
+      if (!Array.isArray(data)) {
+        console.warn("Unexpected data format:", data);
+        setRows([]);
+        return;
+      }
+
+      // Filter students where newHours is not "0"
+      const filteredStudents = data.filter(
+        (student) => student.newHours && student.newHours !== "0"
+      );
+      setRows(filteredStudents);
+
+      // Initialize the checkbox state based on the number of rows
+      setCheckboxState(new Array(filteredStudents.length).fill(false));
+    } catch (error) {
+      console.error("Error fetching students:", error);
+      setRows([]);
+    }
+  };
+
+  // Refresh data function
+  const refreshData = () => {
+    fetchData(); // Now fetchData is defined and can be called
+  };
+
+  useEffect(() => {
+    if (loggedInUserEmail) {
+      fetchData();
+    } else {
+      console.warn("No email found for logged-in user.");
+    }
+  }, [loggedInUserEmail]);
 
   // Export table data for Excel download
   React.useImperativeHandle(ref, () => ({
@@ -251,9 +232,10 @@ const MainTable = React.forwardRef((_, ref) => {
         "اسم الطالب": row.name,
         المستوى: row.level,
         "الساعات الجديدة": row.newHours,
-        "الساعات القديمة": row.oldHours,
-        التاريخ: row.date,
+        "الساعات المكتملة": row.hoursCompleted,
+        "رقم الجوال": row.phoneNumber,
       })),
+    refreshData, // Expose refreshData to parent component
   }));
 
   const headers = [
@@ -261,22 +243,49 @@ const MainTable = React.forwardRef((_, ref) => {
     "اسم الطالب",
     "المستوى",
     "الساعات الجديدة",
-    "الساعات القديمة",
-    "التاريخ",
+    "الساعات المكتملة",
+    "رقم الجوال",
     "التحقق",
   ];
 
-  const handleClick = (index) => {
-    setRows((prevRows) => {
-      const updatedRows = [...prevRows];
-      updatedRows[index] = {
-        ...updatedRows[index],
-        isChecked: !updatedRows[index].isChecked,
-      };
-      const [rowToMove] = updatedRows.splice(index, 1);
-      updatedRows.push(rowToMove);
-      return updatedRows;
-    });
+  // Function to handle "التحقق" button click
+  const handleClick = async (index) => {
+    const selectedStudent = rows[index];
+    const updatedHours =
+      parseInt(selectedStudent.newHours) +
+      parseInt(selectedStudent.hoursCompleted || "0");
+
+    try {
+      const studentRef = doc(
+        db,
+        "schools",
+        selectedStudent.school,
+        "students",
+        selectedStudent.id
+      );
+      await updateDoc(studentRef, {
+        hoursCompleted: updatedHours.toString(),
+        newHours: "0",
+      });
+
+      setRows((prevRows) => {
+        const updatedRows = [...prevRows];
+        updatedRows[index] = {
+          ...updatedRows[index],
+          hoursCompleted: updatedHours,
+          newHours: "0",
+          isChecked: !updatedRows[index].isChecked,
+        };
+
+        // Move the verified student to the end of the list
+        const [rowToMove] = updatedRows.splice(index, 1);
+        updatedRows.push(rowToMove);
+
+        return updatedRows;
+      });
+    } catch (error) {
+      console.error("Error updating student:", error);
+    }
   };
 
   return (
@@ -295,17 +304,17 @@ const MainTable = React.forwardRef((_, ref) => {
           <tbody>
             {rows.map((row, rowIndex) => (
               <tr
+                className="bg-white text-[#232323] border-b hover:bg-gray-100"
                 key={rowIndex}
-                className="bg-white text-[#232323] border-b hover:bg-gray-100 cursor-pointer"
               >
                 <td className="py-3">
                   <img src={maleIcon} alt="male student icon" />
                 </td>
-                <td className="px-4 py-3">{row.name}</td>
-                <td className="px-4 py-3">{row.level}</td>
-                <td className="px-4 py-3">{row.newHours}</td>
-                <td className="px-4 py-3">{row.oldHours}</td>
-                <td className="px-4 py-3">{row.date}</td>
+                <td className="px-3 py-3">{row.name}</td>
+                <td className="px-3 py-3">{row.level}</td>
+                <td className="px-3 py-3">{row.newHours}</td>
+                <td className="px-3 py-3">{row.hoursCompleted}</td>
+                <td className="px-3 py-3">{row.phoneNumber}</td>
                 <td className="px-4 py-3 flex justify-center items-center">
                   <svg
                     onClick={() => handleClick(rowIndex)}
