@@ -1,6 +1,6 @@
 import SideNav from "../components/sideNav.js";
 import Nav from "../components/nav.js";
-import TableLocal from "../Home/Table.js";
+import TablesController from "../Home/TablesController.js";
 
 const HomePage = () => {
   return (
@@ -15,7 +15,7 @@ const HomePage = () => {
         <SideNav></SideNav>
       </div>
       <div className="bg-[#F3F3F3] max-h-[100vh] overflow-y-auto">
-        <TableLocal></TableLocal>
+        <TablesController></TablesController>
       </div>
     </section>
   );
