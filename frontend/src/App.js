@@ -6,7 +6,7 @@ import StudentPage from "./Pages/StudentPage.js";
 import ProfilePage from "./Pages/ProfilePage.js";
 import SettingsPage from "./Pages/SettingsPage.js";
 import NotificationPage from "./Pages/NotificationsPage.js";
-import StudentDetails from "./Home/StudentDetails.js";
+import StudentDetails from "./Student/StudentDetails.js";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {

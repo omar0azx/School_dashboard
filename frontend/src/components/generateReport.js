@@ -16,7 +16,7 @@ async function loadTemplate(templateUrl) {
 }
 
 // Generate the Word document with placeholders filled
-export async function generatePDF(opportunity, student) {
+export async function generateReport(opportunity, student) {
   try {
     const templatePath = MyTemplatePath;
     const templateContent = await loadTemplate(templatePath);
