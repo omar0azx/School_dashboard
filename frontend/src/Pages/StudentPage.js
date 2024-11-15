@@ -22,7 +22,7 @@ function StudentPage() {
           <StudentNav setSearchQuery={setSearchQuery}></StudentNav>{" "}
         </div>
         <div className="col-start-1 row-start-1 row-end-3 bg-black w-full">
-          <StudentSideNav searchQuery={searchQuery}></StudentSideNav>
+          <StudentSideNav></StudentSideNav>
         </div>
         <div className="bg-[#F3F3F3] max-h-[100vh] overflow-y-auto">
           <div className="flex justify-center items-center gap-5 mt-3">
