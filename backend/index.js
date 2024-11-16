@@ -130,6 +130,7 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 // Endpoint for fetching user info by email
 app.get("/profile/:email", async (req, res) => {
   const { email } = req.params;
@@ -302,6 +303,85 @@ app.post("/changeSchoolKey", async (req, res) => {
   } catch (error) {
     console.error("Error changing school key:", error);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Endpoint for fetching last opportunities to use it in ReportsTable
+app.get("/opportunities", async (req, res) => {
+  const { email } = req.query; // Get email from query parameters
+
+  try {
+    if (!email) {
+      return res.status(400).json({ error: "Email is required." });
+    }
+
+    // Step 1: Search across all schools to find the schoolCode for the user by email
+    const schoolsRef = db.collection("schools");
+    const querySnapshot = await schoolsRef.get();
+
+    let schoolCode = null;
+
+    for (const doc of querySnapshot.docs) {
+      const schoolOfficialsRef = doc.ref.collection("school_officials");
+      const userSnapshot = await schoolOfficialsRef
+        .where("email", "==", email)
+        .get();
+
+      if (!userSnapshot.empty) {
+        schoolCode = doc.id; // Found the schoolCode
+        break;
+      }
+    }
+
+    if (!schoolCode) {
+      return res.status(404).json({ error: "School not found for the user." });
+    }
+
+    // Continue with the rest of the code to fetch opportunities
+    const studentsRef = db
+      .collection("schools")
+      .doc(schoolCode)
+      .collection("students");
+    const studentsSnapshot = await studentsRef
+      .where("lastOpportunity", "!=", "")
+      .get();
+
+    if (studentsSnapshot.empty) {
+      return res
+        .status(404)
+        .json({ message: "No students found with opportunities." });
+    }
+
+    const opportunitiesData = [];
+    for (const studentDoc of studentsSnapshot.docs) {
+      const student = studentDoc.data();
+      const lastOpportunityId = student.lastOpportunity;
+
+      // Query the opportunity details using collectionGroup to fetch any document in "opportunities"
+      const opportunitySnapshot = await db
+        .collectionGroup("opportunities")
+        .where("id", "==", lastOpportunityId)
+        .get();
+
+      if (!opportunitySnapshot.empty) {
+        const opportunity = opportunitySnapshot.docs[0].data();
+        opportunitiesData.push({
+          studentName: student.name, // Ensure studentName is passed here
+          opportunityName: opportunity.name,
+          hour: opportunity.hour,
+          date: opportunity.date,
+          level: student.level,
+          city: student.city,
+          description: opportunity.description,
+          organizationName: opportunity.organizationName,
+        });
+      }
+    }
+
+    return res.json(opportunitiesData); // Send response with all necessary fields
+  } catch (error) {
+    console.error("Error fetching opportunities:", error);
+    res.status(500).json({ error: "Failed to fetch opportunities." });
   }
 });
 
