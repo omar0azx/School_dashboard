@@ -57,7 +57,7 @@ const MainTable = React.forwardRef(({ searchQuery }, ref) => {
           "اسم الطالب": row.name,
           المستوى: row.level,
           "الساعات الجديدة": row.newHours,
-          // Remove 'الساعات المكتملة' since you want to ignore it
+          "الساعات المكتملة": row.hoursCompleted,
           "رقم الجوال": row.phoneNumber,
         })),
     refreshData,
@@ -68,7 +68,7 @@ const MainTable = React.forwardRef(({ searchQuery }, ref) => {
     "اسم الطالب",
     "المستوى",
     "الساعات الجديدة",
-    // Remove 'الساعات المكتملة' from headers as well
+    "الساعات المكتملة",
     "رقم الجوال",
     "التحقق",
   ];
@@ -112,7 +112,16 @@ const MainTable = React.forwardRef(({ searchQuery }, ref) => {
     (row) =>
       row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       row.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      row.phoneNumber.includes(searchQuery)
+      row.phoneNumber.includes(searchQuery) ||
+      (typeof row.hoursCompleted === "string" &&
+        row.hoursCompleted.includes(searchQuery)) ||
+      (typeof row.hoursCompleted === "number" &&
+        row.hoursCompleted.toString().includes(searchQuery)) || // Handle number type by converting to string
+      row.level.toLowerCase().includes(searchQuery) ||
+      (typeof row.newHours === "string" &&
+        row.newHours.includes(searchQuery)) ||
+      (typeof row.newHours === "number" &&
+        row.newHours.toString().includes(searchQuery)) // Handle number type by converting to string
   );
 
   return loading ? (
