@@ -86,7 +86,7 @@ const TablesController = ({ searchQuery }) => {
           </div>
 
           <button
-            className="ml-7 shadow-lg shadow-[#23232355] bg-[#232323] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl"
+            className="ml-7 shadow-lg shadow-[#23232355] bg-[#232323] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
             onClick={handleDownloadExcel} // Attach download function
           >
             تنزيل ملف الاكسل
