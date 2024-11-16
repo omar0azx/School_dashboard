@@ -28,15 +28,18 @@ export async function generateReport(opportunity, student) {
       linebreaks: true,
     });
 
-    // Set placeholder values to match the placeholders in the Word template
+    // Ensure the student object has the name property
     doc.setData({
-      name: student.name || "N/A",
-      opportunity: opportunity.name || "N/A",
-      city: opportunity.city || "Jeddah",
-      date: opportunity.date || "N/A",
-      description: opportunity.description || "العمل التطوعي",
-      hours: opportunity.hour || "0",
-      organizationName: opportunity.organizationName,
+      studentName: student?.name || opportunity?.studentName || "N/A",
+      opportunityName:
+        opportunity?.name || opportunity?.opportunityName || "N/A",
+      city: opportunity ? opportunity.city || "N/A" : "N/A",
+      date: opportunity ? opportunity.date || "N/A" : "N/A",
+      description: opportunity ? opportunity.description || "N/A" : "N/A",
+      hours: opportunity ? opportunity.hour || "N/A" : "N/A",
+      organizationName: opportunity
+        ? opportunity.organizationName || "N/A"
+        : "N/A",
     });
 
     // Render the document with the provided data
@@ -55,7 +58,10 @@ export async function generateReport(opportunity, student) {
     });
 
     // Download the generated Word document
-    saveAs(docxContent, `تقرير_فرصة_${opportunity.name}.docx`);
+    saveAs(
+      docxContent,
+      `تقرير_فرصة_${opportunity.name || opportunity?.opportunityName}.docx`
+    );
   } catch (error) {
     console.error("Error generating Word document:", error);
   }
