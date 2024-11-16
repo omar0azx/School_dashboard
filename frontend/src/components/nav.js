@@ -80,7 +80,8 @@ const Nav = ({ setSearchQuery }) => {
   // Check if the current page is the a prvented page from searching
   const isPrevnetedPage =
     location.pathname === "/NotificationPage" ||
-    location.pathname === "/SettingsPage";
+    location.pathname === "/SettingsPage" ||
+    location.pathname === "/ProfilePage";
 
   return (
     <nav className="grid grid-cols-3 items-center h-20 bg-white shadow-md px-6">
@@ -94,7 +95,7 @@ const Nav = ({ setSearchQuery }) => {
           {isActive("/NotificationPage") && "الإشعارات"}
         </span>
       </div>
-      <div className="flex justify-center relative w-full max-w-md">
+      <div className="flex justify-center relative w-full max-w-md group">
         <input
           type="text"
           placeholder="بحث..."
@@ -115,6 +116,13 @@ const Nav = ({ setSearchQuery }) => {
             fill="#6A6A6A"
           />
         </svg>
+        {/* Tooltip */}
+        <span
+          hidden={isPrevnetedPage}
+          className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-sm text-[#ffffff] bg-[#232323] px-2 py-1 rounded-xl shadow-md z-50"
+        >
+          البحث داخل الجدول
+        </span>
       </div>
 
       <div className="flex items-center justify-end relative">

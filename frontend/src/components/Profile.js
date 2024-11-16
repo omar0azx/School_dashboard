@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import Loader from "../components/Loader.js"; // Import the Loader component
 import editProfileIcon from "../assets/icon_edit.svg";
 import emailIcon from "../assets/icon_email.svg";
 import phoneIcon from "../assets/icon_phone.svg";
@@ -17,11 +18,13 @@ const Profile = () => {
   });
   const [originalUserInfo, setOriginalUserInfo] = useState(userInfo);
   const [userEmail, setUserEmail] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   const modalRef = useRef(null);
 
   // Fetch user info based on email
   const fetchUserInfo = async (email) => {
     try {
+      setIsLoading(true); // Start loading
       const response = await fetch(`http://localhost:5000/profile/${email}`);
       if (!response.ok) {
         throw new Error("User not found");
@@ -30,6 +33,8 @@ const Profile = () => {
       setUserInfo(data);
     } catch (error) {
       console.error("Error fetching user info:", error);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -41,6 +46,7 @@ const Profile = () => {
         fetchUserInfo(user.email);
       } else {
         setUserEmail(null);
+        setIsLoading(false); // Stop loading if no user
       }
     });
   }, []);
@@ -54,33 +60,26 @@ const Profile = () => {
     try {
       setIsEditing(false);
 
-      // Prepare the data to update, setting undefined values to null
       const updatedData = {
         name: userInfo.name !== undefined ? userInfo.name : null,
         phone: userInfo.phone !== undefined ? userInfo.phone : null,
         location: userInfo.location !== undefined ? userInfo.location : null,
       };
 
-      // Send the updated data to your backend API using the current user's email
       const response = await fetch(`http://localhost:5000/updateProfile`, {
-        method: "POST", // Use POST to update
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: userEmail, // Use the logged-in user's email
-          ...updatedData, // Spread the updated data
+          email: userEmail,
+          ...updatedData,
         }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to update profile");
       }
-      const fullName = userInfo.name;
-      const firstNameOnly = fullName.split(" ")[0];
-      localStorage.setItem("userFirstName", firstNameOnly); // Store first name in localStorage
-
-      // Optionally, fetch updated user info
       fetchUserInfo(userEmail);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -108,6 +107,10 @@ const Profile = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [handleCloseClick]);
+
+  if (isLoading) {
+    return <Loader />; // Show Loader while loading
+  }
 
   return (
     <div className="w-full m-0 2k:w-[100%] fullhd:w-[100%] relative">
