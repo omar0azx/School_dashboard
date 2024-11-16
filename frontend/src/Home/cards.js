@@ -7,6 +7,8 @@ import Hours_Icon from "../assets/icon_hours_card.svg";
 
 const Cards = () => {
   const [studentCount, setStudentCount] = useState(0);
+  const [totalVolunteeringHours, setTotalVolunteeringHours] = useState(0); // State to hold total volunteering hours
+  const [opportunityCount, setOpportunityCount] = useState(0); // State to hold total opportunity count
   const [schoolCode, setSchoolCode] = useState(null);
 
   // Get logged-in user's email from localStorage
@@ -59,21 +61,41 @@ const Cards = () => {
     fetchSchoolCode();
   }, [loggedInEmail]);
 
-  // Fetch student count for the current school code, where `isStudentAccepted = 1`
+  // Fetch student count, total volunteering hours, and opportunity count for the current school code
   useEffect(() => {
     console.log("schoolCode:", schoolCode); // Log the schoolCode value
-    const fetchStudentCount = async () => {
+    const fetchStudentData = async () => {
       if (schoolCode) {
         const studentsRef = collection(db, "schools", schoolCode, "students");
         const q = query(studentsRef, where("isStudentAccepted", "==", 1)); // Add the condition for accepted students
         const querySnapshot = await getDocs(q);
+
+        let totalHours = 0;
+        let totalOpportunities = 0;
+
+        querySnapshot.forEach((doc) => {
+          const studentData = doc.data();
+          const hours = parseFloat(studentData.hoursCompleted); // Convert string to number
+          if (!isNaN(hours)) {
+            totalHours += hours; // Add to total if it's a valid number
+          }
+          totalOpportunities += studentData.opportunities
+            ? studentData.opportunities.length
+            : 0; // Count the number of opportunities
+        });
+
         console.log("Number of Accepted Students:", querySnapshot.size); // Log accepted student count
-        setStudentCount(querySnapshot.size);
+        console.log("Total Volunteering Hours:", totalHours); // Log total volunteering hours
+        console.log("Total Opportunities:", totalOpportunities); // Log total opportunities
+
+        setStudentCount(querySnapshot.size); // Set student count
+        setTotalVolunteeringHours(totalHours); // Set total volunteering hours
+        setOpportunityCount(totalOpportunities); // Set total opportunities count
       }
     };
 
     if (schoolCode) {
-      fetchStudentCount();
+      fetchStudentData();
     } else {
       console.log("Waiting for schoolCode to be set...");
     }
@@ -88,7 +110,8 @@ const Cards = () => {
         </div>
         <div className="pl-4 text-center">
           <span className="text-xl text-[#232323] font-bold">
-            <span>1,250+</span>
+            <span>{totalVolunteeringHours.toLocaleString()}+</span>{" "}
+            {/* Display formatted total hours */}
             <br />
             ساعة تطوعية
           </span>
@@ -126,7 +149,7 @@ const Cards = () => {
         </div>
         <div className="pl-4 text-center">
           <span className="text-xl text-[#232323] font-bold">
-            <span>1,250+</span>
+            <span>{opportunityCount.toLocaleString()}+</span>
             <br />
             فرصة تطوعية
           </span>

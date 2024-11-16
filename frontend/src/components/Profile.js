@@ -166,7 +166,7 @@ const Profile = () => {
               className="w-6 h-6 fullhd:w-6 fullhd:h-6 2k:w-8 2k:h-8 ml-2"
             />
             <span className="text-[1rem] fullhd:text-[1rem] 2k:text-[1.5rem] font-cairo">
-              {userInfo.location}
+              {userInfo.location || "لايوجد"}
             </span>
           </div>
         </section>
