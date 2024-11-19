@@ -45,6 +45,15 @@ const Nav = ({ setSearchQuery }) => {
 
   // Monitor authentication state
   useEffect(() => {
+    const handleStorageChange = () => {
+      const storedFirstName = localStorage.getItem("userFirstName");
+      if (storedFirstName) {
+        setFirstName(storedFirstName);
+      }
+    };
+
+    // Listen for changes in localStorage
+    window.addEventListener("storage", handleStorageChange);
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -61,6 +70,9 @@ const Nav = ({ setSearchQuery }) => {
         setFirstName(""); // Clear first name if not logged in
       }
     });
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   // Close dropdown if clicking outside of it

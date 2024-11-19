@@ -18,6 +18,7 @@ const Profile = () => {
   });
   const [originalUserInfo, setOriginalUserInfo] = useState(userInfo);
   const [userEmail, setUserEmail] = useState(null);
+  const [firstName, setFirstName] = useState("");
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const modalRef = useRef(null);
 
@@ -81,6 +82,11 @@ const Profile = () => {
         throw new Error("Failed to update profile");
       }
       fetchUserInfo(userEmail);
+      const fullName = userInfo.name;
+      const firstNameOnly = fullName.split(" ")[0];
+      setFirstName(firstNameOnly);
+      localStorage.setItem("userFirstName", firstNameOnly); // Store first name in localStorage
+      window.dispatchEvent(new Event("storage"));
     } catch (error) {
       console.error("Error updating profile:", error);
     }
@@ -233,7 +239,7 @@ const Profile = () => {
               </div>
               <div>
                 <label className="block text-[#3f3f3f] text-right font-sans text-lg font-semibold mb-1">
-                  الموقع:
+                  المدينة:
                 </label>
                 <input
                   type="text"

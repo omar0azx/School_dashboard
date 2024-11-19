@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth"; // Import Firebase methods
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth"; // Import Firebase methods
 import {
   getFirestore,
   collection,
@@ -22,6 +26,7 @@ const Login = () => {
   const [email, setEmail] = useState(""); // State for email
   const [password, setPassword] = useState(""); // State for password
   const [error, setError] = useState(""); // State for error messages
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false); // Loading state
 
   const handleLoginSubmit = async (e) => {
@@ -62,7 +67,7 @@ const Login = () => {
       }
 
       if (!emailFound) {
-        setError("هذا البريد الإلكتروني غير مصرح له بالدخول");
+        setError(".البريد الإلكتروني غير مصرح له بالدخول او غير صحيح");
         setLoading(false);
         return;
       }
@@ -95,10 +100,35 @@ const Login = () => {
     }
   };
 
-  const handleForgotPasswordSubmit = (e) => {
+  const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
-    console.log("Password reset link sent!");
-    // Additional logic to send reset link
+
+    console.log("Attempting password reset for email:", email); // Debug log
+
+    if (!email.trim()) {
+      setError("يرجى إدخال بريد إلكتروني صالح.");
+      return;
+    }
+
+    const auth = getAuth();
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMessage(
+        "تم إرسال بريد استعادة كلمة المرور. يرجى التحقق من بريدك الإلكتروني."
+      );
+      setError(""); // Clear any previous errors
+    } catch (err) {
+      console.error("Error in sendPasswordResetEmail:", err); // Log error details
+      setMessage(""); // Clear any previous success message
+      if (err.code === "auth/invalid-email") {
+        setError("البريد الإلكتروني غير صالح.");
+      } else if (err.code === "auth/user-not-found") {
+        setError("لا يوجد مستخدم مرتبط بهذا البريد الإلكتروني.");
+      } else {
+        setError("حدث خطأ. حاول مرة أخرى.");
+      }
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -140,6 +170,8 @@ const Login = () => {
                 <input
                   type="email"
                   id="email"
+                  value={email} // Bind the email state
+                  onChange={(e) => setEmail(e.target.value)} // Update the email state
                   className="shadow appearance-none border rounded-2xl w-full py-2 px-4 pr-10 text-gray-700 leading-tight focus:outline focus:shadow-outline"
                   placeholder="البريد الالكتروني"
                   style={{ backgroundColor: "#9d9d9d12" }}
@@ -151,6 +183,10 @@ const Login = () => {
                   className="absolute right-3 top-2 w-5 h-5"
                 />
               </div>
+              {message && (
+                <p className="text-green-500 text-sm mb-4">{message}</p>
+              )}
+              {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
               <button
                 type="submit"
                 className="shadow-lg shadow-cyan-500/50 bg-[#3BCAD3] hover:bg-[#3bc9d3ba] text-white font-bold py-2 px-6 rounded"

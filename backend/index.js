@@ -291,10 +291,14 @@ app.post("/changeSchoolKey", async (req, res) => {
 
     // Get user data and add to new school's school_officials subcollection
     const userData = (await userDocRef.get()).data();
+    userData.schoolCode = newSchoolCode; // Ensure the schoolCode is updated
+
+    // Move the user data to the new school's school_officials collection
     await schoolsRef
       .doc(newSchoolCode)
       .collection("school_officials")
-      .add(userData);
+      .doc(userDocRef.id) // Use the same user ID to update the document
+      .set(userData); // Use set to update the document, not add a new one
 
     // Delete user from old school_officials collection
     await userDocRef.delete();

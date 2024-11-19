@@ -94,10 +94,11 @@ const SignUpContent = () => {
       // Show success modal
       setShowSuccessModal(true);
 
-      // Redirect to login page after 3 seconds
+      // Redirect to home page after 3 seconds
       setTimeout(() => {
         setShowSuccessModal(false);
-        navigate("/loginPage");
+        localStorage.setItem("userEmail", email);
+        navigate("/HomePage");
       }, 5000);
     } catch (error) {
       // Handle errors
@@ -106,7 +107,7 @@ const SignUpContent = () => {
         errorMessage =
           "عنوان البريد الإلكتروني غير صحيح. يرجى إدخال بريد إلكتروني صحيح";
       } else if (error.code === "auth/weak-password") {
-        errorMessage = "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل";
+        errorMessage = "يجب أن تتكون كلمة المرور من 6 أحرف وأرقام على الأقل";
       } else if (error.code === "auth/email-already-in-use") {
         errorMessage =
           "البريد الإلكتروني مستخدم بالفعل. يرجى استخدام بريد إلكتروني آخر";
@@ -267,7 +268,7 @@ const SignUpContent = () => {
       {showSuccessModal && (
         <SuccessModal
           title="!تم إنشاء الحساب"
-          message=".سيتم تحويلك الى صفحة تسجيل الدخول"
+          message=".سيتم تحويلك الى الصفحة الرئيسية"
           onClose={() => setShowSuccessModal(false)}
         />
       )}
