@@ -36,6 +36,28 @@ app.use(
 );
 app.use(express.json());
 
+// Endpoint for schoolCode checking
+app.post("/validate-school", async (req, res) => {
+  const { schoolCode } = req.body;
+
+  // Check if the school code exists in the 'schools' collection
+  try {
+    const schoolRef = db.collection("schools").doc(schoolCode);
+    const schoolDoc = await schoolRef.get();
+
+    if (schoolDoc.exists) {
+      return res.status(200).json({ message: "School code is valid" });
+    } else {
+      return res.status(400).json({ error: "School code not found" });
+    }
+  } catch (error) {
+    console.error("Error checking school code:", error);
+    return res
+      .status(500)
+      .json({ error: "Server error while checking school code" });
+  }
+});
+
 // Endpoint for user signup
 app.post("/signup", async (req, res) => {
   console.log("Request body:", req.body);

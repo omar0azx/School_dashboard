@@ -37,13 +37,16 @@ const StudentDetails = () => {
     </section>
   );
 };
+
 export default StudentDetails;
+
 function StudentContent({ student, navigate }) {
   const [opportunities, setOpportunities] = useState([]);
   const [imageUrls, setImageUrls] = useState({}); // State to store organization image URLs
   const db = getFirestore(); // Firestore instance
   const storage = getStorage(); // Firebase storage instance
   const [loading, setLoading] = useState(true); // Loading state
+  const [displayedProgress, setDisplayedProgress] = useState(0); // Track the animated progress bar
 
   useEffect(() => {
     const fetchOpportunities = async () => {
@@ -92,6 +95,91 @@ function StudentContent({ student, navigate }) {
     fetchOpportunities();
   }, [student.opportunities, db, storage]);
 
+  // Calculate progress dynamically
+  const totalHoursRequired = 40;
+  const progressPercentage =
+    student.hoursCompleted && totalHoursRequired
+      ? Math.min((student.hoursCompleted / totalHoursRequired) * 100, 100)
+      : 0;
+
+  // Animate progress bar
+  useEffect(() => {
+    const animateProgress = () => {
+      if (displayedProgress < progressPercentage) {
+        setDisplayedProgress((prev) => Math.min(prev + 1, progressPercentage)); // Increment progress
+      }
+    };
+
+    // Use setInterval to animate the progress
+    const interval = setInterval(animateProgress, 30); // Controls the speed of the animation
+
+    // Clear interval when animation completes
+    if (displayedProgress >= progressPercentage) {
+      clearInterval(interval);
+    }
+
+    // Cleanup on component unmount or when progressPercentage changes
+    return () => clearInterval(interval);
+  }, [progressPercentage, displayedProgress]);
+
+  // Function to create the circular progress bar (SVG)
+  const CircularProgressBar = ({ progress, hoursCompleted }) => {
+    const radius = 35; // Radius of the circle
+    const strokeWidth = 6; // Stroke width of the circle
+    const circumference = 2 * Math.PI * radius; // Total circumference of the circle
+    const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+    // Rotate the circle to start from the top (12 o'clock position)
+    const rotation = -90; // Rotate counterclockwise by 90 degrees to start from the top
+
+    return (
+      <svg width="90" height="90" className="transform rotate-0">
+        {/* Background circle */}
+        <circle
+          cx="45"
+          cy="45"
+          r={radius}
+          stroke="#e6e6e6"
+          strokeWidth={strokeWidth}
+          fill="none"
+        />
+        {/* Progress circle with gradient and shadow */}
+        <circle
+          cx="45"
+          cy="45"
+          r={radius}
+          stroke="url(#gradient)" // Apply gradient for dynamic color
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          transition="stroke-dashoffset 1s ease"
+          transform={`rotate(${rotation} 45 45)`} // Apply rotation here
+          className="shadow-xl" // Add shadow effect
+        />
+        {/* Gradient definition */}
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#3BCAD3" />
+            <stop offset="100%" stopColor="#6d98c1" />
+          </linearGradient>
+        </defs>
+        {/* Progress text */}
+        <text
+          x="50%"
+          y="50%"
+          textAnchor="middle"
+          dy="7px"
+          fontSize="16"
+          fontWeight="600" // Semibold
+          fill="#333" // Darker text for better contrast
+        >
+          {hoursCompleted > 40 ? hoursCompleted : `${hoursCompleted} / 40`}
+        </text>
+      </svg>
+    );
+  };
+
   return (
     <div className="p-8 space-y-4">
       {/* Back Button */}
@@ -116,6 +204,41 @@ function StudentContent({ student, navigate }) {
             {student.name || "N/A"}
           </h2>
         </div>
+
+        {/* Circular Progress Bar */}
+        <div className="flex flex-col items-center justify-center mx-4">
+          {student.hoursCompleted >= 40 && student.hoursCompleted <= 50 ? (
+            <div className="text-green-500 flex flex-col items-center justify-center">
+              {/* Check Icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <circle cx="8" cy="8" r="8" fill="currentColor" />
+                <path
+                  fill="#fff"
+                  d="M12.146 5.854a.5.5 0 0 1 0 .707l-4.5 4.5a.5.5 0 0 1-.707 0l-2-2a.5.5 0 1 1 .707-.707l1.646 1.647 4.146-4.147a.5.5 0 0 1 .707 0z"
+                />
+              </svg>
+
+              <p className="font-medium text-sm mt-2">
+                تم إكمال 40 ساعة تطوعية!
+              </p>
+            </div>
+          ) : (
+            <>
+              <CircularProgressBar
+                progress={displayedProgress}
+                hoursCompleted={student.hoursCompleted || 0}
+              />
+              <p className="font-medium text-sm">ساعة تطوعية</p>
+            </>
+          )}
+        </div>
+
         <div className="text-center">
           <button
             className="bg-gray-300 text-white font-semibold py-2 px-6 rounded-2xl cursor-not-allowed"
@@ -131,7 +254,6 @@ function StudentContent({ student, navigate }) {
       </div>
 
       {/* Volunteering Opportunities Table */}
-      {/* Conditionally render loader or table */}
       {loading ? (
         <Loader />
       ) : (
@@ -164,30 +286,18 @@ function StudentContent({ student, navigate }) {
                       </td>
                       <td className="px-4 py-2">{opportunity.name || "N/A"}</td>
                       <td className="px-4 py-2">
-                        {opportunity.organizationName || "Unknown Organization"}
+                        {opportunity.organizationName || "N/A"}
                       </td>
-                      <td className="px-4 py-2">{opportunity.hour || 0}</td>
                       <td className="px-4 py-2">
-                        {opportunity.date || "Unknown Date"}
+                        {opportunity.hour || "N/A"} س
                       </td>
-                      <td className="px-4 py-3 flex justify-center items-center">
-                        <button
-                          onClick={() => generateReport(opportunity, student)}
-                          className="shadow-lg shadow-[#23232355] bg-[#23232372] hover:bg-[#232323d2] text-white font-bold py-2 px-6 rounded-xl"
-                          style={{
-                            borderRadius: "15px",
-                            transition: "all 0.1s ease-in-out",
-                          }}
-                        >
-                          تنزيل
-                        </button>
-                      </td>
+                      <td className="px-4 py-2">{opportunity.date || "N/A"}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="text-center py-3">
-                      لا توجد فرص تطوعية منتهية
+                    <td colSpan="5" className="text-center py-4 text-gray-500">
+                      لا توجد فرص تطوعية
                     </td>
                   </tr>
                 )}
