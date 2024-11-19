@@ -20,8 +20,26 @@ const Profile = () => {
   const [userEmail, setUserEmail] = useState(null);
   const [firstName, setFirstName] = useState("");
   const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [phoneError, setPhoneError] = useState(""); // Error state for phone number
+
   const modalRef = useRef(null);
 
+  // List of predefined cities
+  const cities = [
+    "الرياض",
+    "جدة",
+    "الدمام",
+    "مكة",
+    "المدينة",
+    "القصيم",
+    "الطائف",
+  ];
+
+  // Validate phone number (must start with "05" and have length 10)
+  const validatePhoneNumber = (phone) => {
+    const phonePattern = /^05\d{8}$/; // Must start with 05 followed by 8 digits
+    return phonePattern.test(phone);
+  };
   // Fetch user info based on email
   const fetchUserInfo = async (email) => {
     try {
@@ -92,9 +110,15 @@ const Profile = () => {
     }
   };
 
-  const handleChange = (e) =>
-    setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
-
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "phone" && !validatePhoneNumber(value)) {
+      setPhoneError("رقم الهاتف يجب أن يبدأ بـ 05 وطوله 10 أرقام");
+    } else {
+      setPhoneError(""); // Clear error if valid
+    }
+    setUserInfo({ ...userInfo, [name]: value });
+  };
   const handleCloseClick = useCallback(() => {
     setIsEditing(false);
     setUserInfo(originalUserInfo);
@@ -140,13 +164,19 @@ const Profile = () => {
           <h1 className="text-3xl fullhd:text-3xl 2k:text-[3rem] text-[#3f3f3f]">
             {userInfo.name}
           </h1>
-          <img
-            src={editProfileIcon}
-            alt="edit Icon"
-            className="w-7 h-7 fullhd:w-7 fullhd:h-7 2k:w-10 2k:h-10 text-[#3f3f3f] mt-[7px] cursor-pointer"
-            onClick={handleEditClick}
-          />
+          <div className="relative group">
+            <img
+              src={editProfileIcon}
+              alt="edit Icon"
+              className="w-7 h-7 fullhd:w-7 fullhd:h-7 2k:w-10 2k:h-10 text-[#3f3f3f] mt-[7px] cursor-pointer"
+              onClick={handleEditClick}
+            />
+            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-sm text-[#ffffff] bg-[#232323] px-2 py-1 rounded-xl shadow-md">
+              تعديل
+            </span>
+          </div>
         </div>
+
         <section className="col-start-1 col-end-2 text-right border-l-[2px] border-[#3f3f3f] text-[#3f3f3f]">
           <div className="flex items-center mb-5">
             <img
@@ -236,19 +266,33 @@ const Profile = () => {
                   placeholder="********05"
                   className="w-full border p-2 rounded-xl bg-[#9d9d9d12]"
                 />
+                {phoneError && <p className="text-red-500">{phoneError}</p>}
               </div>
               <div>
                 <label className="block text-[#3f3f3f] text-right font-sans text-lg font-semibold mb-1">
                   المدينة:
                 </label>
-                <input
-                  type="text"
+                <select
+                  id="location"
                   name="location"
                   value={userInfo.location}
                   onChange={handleChange}
-                  placeholder="مثال: الرياض"
-                  className="w-full border p-2 rounded-xl bg-[#9d9d9d12]"
-                />
+                  className="w-full border p-2 rounded-xl bg-[#9d9d9d12] text-gray-700"
+                >
+                  <option
+                    value=""
+                    disabled
+                    selected
+                    className="text-gray-500 opacity-50"
+                  >
+                    اختر مدينة
+                  </option>
+                  {cities.map((city, index) => (
+                    <option key={index} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </select>
               </div>
               <button
                 type="button"

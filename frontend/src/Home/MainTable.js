@@ -75,7 +75,6 @@ const MainTable = React.forwardRef(({ searchQuery }, ref) => {
 
   const handleClick = async (index) => {
     const selectedStudent = rows[index];
-    const updatedHours = parseInt(selectedStudent.newHours) || 0;
 
     try {
       const studentRef = doc(
@@ -111,7 +110,6 @@ const MainTable = React.forwardRef(({ searchQuery }, ref) => {
   const filteredRows = rows.filter(
     (row) =>
       row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      row.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       row.phoneNumber.includes(searchQuery) ||
       (typeof row.hoursCompleted === "string" &&
         row.hoursCompleted.includes(searchQuery)) ||
@@ -146,7 +144,7 @@ const MainTable = React.forwardRef(({ searchQuery }, ref) => {
                   colSpan={headers.length}
                   className="text-center py-5 font-semibold"
                 >
-                  لايوجد طلاب لديهم ساعات جديدة
+                  لايوجد طلاب لديهم ساعات جديدة.
                 </td>
               </tr>
             ) : (
