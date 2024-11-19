@@ -24,6 +24,7 @@ const AllStudentsTable = ({ searchQuery }) => {
     "",
     "اسم الطالب",
     "المستوى",
+    "الساعات المكتملة",
     "البريد الإلكتروني",
     "رقم الجوال",
   ];
@@ -93,6 +94,10 @@ const AllStudentsTable = ({ searchQuery }) => {
                   </td>
                   <td className="px-3 py-3">{student.name || "N/A"}</td>
                   <td className="px-3 py-3">{student.level || "N/A"}</td>
+                  <td className="px-3 py-3 text-green-500 font-semibold">
+                    {student.hoursCompleted || "N/A"} س
+                  </td>
+
                   <td className="px-3 py-3">{student.email || "N/A"}</td>
                   <td className="px-3 py-3">{student.phoneNumber || "N/A"}</td>
                 </tr>
@@ -138,6 +143,9 @@ const AllStudentsTable = ({ searchQuery }) => {
             </p>
             <p className="mb-4">
               <strong>{selectedStudent.email || "N/A"}</strong>
+            </p>
+            <p className="mb-4 text-green-500 font-semibold">
+              {selectedStudent.hoursCompleted || "N/A"} ساعة تطوعية
             </p>
 
             <div className="flex flex-col items-center gap-4 mt-4">

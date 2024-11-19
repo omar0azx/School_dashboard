@@ -61,9 +61,31 @@ const SignUpContent = () => {
       setError("كلمات المرور غير متطابقة");
       return;
     }
-
+    // Password length validation
+    if (password.length < 6) {
+      setError("كلمة المرور يجب أن تكون على الأقل 6 أحرف او أرقام");
+      return;
+    }
     try {
-      // Create a new user with email and password
+      // Check if the school code is valid
+      const schoolCheckResponse = await fetch(
+        "http://localhost:5000/validate-school",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ schoolCode }),
+        }
+      );
+
+      const schoolCheckData = await schoolCheckResponse.json();
+      if (!schoolCheckResponse.ok) {
+        setError("رمز المدرسة غير موجود" || schoolCheckData.error);
+        return;
+      }
+
+      // Create a new user with email and password in Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -71,6 +93,7 @@ const SignUpContent = () => {
       );
       const user = userCredential.user;
 
+      // Send user data to the backend to store in Firestore
       const response = await fetch("http://localhost:5000/signup", {
         method: "POST",
         headers: {
