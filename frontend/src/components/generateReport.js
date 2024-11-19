@@ -1,7 +1,7 @@
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import { saveAs } from "file-saver";
-import MyTemplatePath from "../assets/template.docx";
+import MyTemplatePath from "../assets/reportTemplate.docx";
 
 // Function to load the Word template from a static URL
 async function loadTemplate(templateUrl) {

@@ -13,7 +13,8 @@ import {
   getDocs,
 } from "firebase/firestore"; // Import Firestore methods
 import { getStorage, ref, getDownloadURL } from "firebase/storage"; // Import Storage functions
-import { generateReport } from "../components/generateReport.js"; // Correct path to generatePDF
+import { finalReportGen } from "../components/finalReportGen.js";
+import DownloadIcon from "../assets/icon_download_file.svg";
 
 const StudentDetails = () => {
   const location = useLocation();
@@ -50,11 +51,17 @@ function StudentContent({ student, navigate }) {
 
   useEffect(() => {
     const fetchOpportunities = async () => {
-      if (student.opportunities?.length > 0) {
+      if (
+        student.opportunities &&
+        Object.keys(student.opportunities).length > 0
+      ) {
         try {
+          // Extract the opportunity IDs from the keys of the opportunities map
+          const opportunityIds = Object.keys(student.opportunities);
+
           const opportunitiesQuery = query(
             collectionGroup(db, "opportunities"),
-            where("id", "in", student.opportunities),
+            where("id", "in", opportunityIds), // Use opportunity IDs from the keys
             where("status", "==", "finished")
           );
 
@@ -94,7 +101,9 @@ function StudentContent({ student, navigate }) {
 
     fetchOpportunities();
   }, [student.opportunities, db, storage]);
-
+  const handleGenerateReport = () => {
+    finalReportGen(student, opportunities);
+  };
   // Calculate progress dynamically
   const totalHoursRequired = 40;
   const progressPercentage =
@@ -240,16 +249,34 @@ function StudentContent({ student, navigate }) {
         </div>
 
         <div className="text-center">
-          <button
-            className="bg-gray-300 text-white font-semibold py-2 px-6 rounded-2xl cursor-not-allowed"
-            title="التقرير النهائي"
-            disabled
-          >
-            التقرير النهائي
-          </button>
-          <p className="text-red-500 mt-2 font-medium text-sm">
-            لايوجد تقرير نهائي لعدم اكمال 40 ساعة
-          </p>
+          <div className="text-center w-full px-4">
+            <button
+              className={`${
+                student.hoursCompleted >= 40
+                  ? "w-full bg-[#3BCAD3] text-white p-2 mt-3 rounded-xl transition-all duration-300 ease-in-out transform hover:bg-[#3bc9d3ba] hover:scale-105 hover:shadow-lg"
+                  : "w-full bg-gray-300 text-gray-500 p-2 mt-3 rounded-xl cursor-not-allowed opacity-50"
+              } flex items-center justify-center`}
+              title="التقرير النهائي"
+              onClick={
+                student.hoursCompleted >= 40 ? handleGenerateReport : null
+              }
+              disabled={student.hoursCompleted < 40}
+            >
+              التقرير النهائي
+              <img
+                src={DownloadIcon}
+                alt="Download Icon"
+                className="w-5 h-5 mr-2"
+              />
+            </button>
+          </div>
+
+          {/* Conditionally render the message if hoursCompleted is less than 40 */}
+          {student.hoursCompleted < 40 && (
+            <p className="text-red-500 mt-2 font-medium text-sm">
+              لايوجد تقرير نهائي لعدم اكمال 40 ساعة
+            </p>
+          )}
         </div>
       </div>
 

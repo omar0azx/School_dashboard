@@ -1,4 +1,3 @@
-// components/Alert.js
 import React from "react";
 
 const Alert = ({ message, type, onClose }) => {

@@ -79,9 +79,10 @@ const Cards = () => {
           if (!isNaN(hours)) {
             totalHours += hours; // Add to total if it's a valid number
           }
-          totalOpportunities += studentData.opportunities
-            ? studentData.opportunities.length
-            : 0; // Count the number of opportunities
+
+          // Count the number of opportunities (keys in the map)
+          const opportunities = studentData.opportunities || {}; // Default to empty object if undefined
+          totalOpportunities += Object.keys(opportunities).length; // Count the number of keys (opportunities)
         });
 
         console.log("Number of Accepted Students:", querySnapshot.size); // Log accepted student count

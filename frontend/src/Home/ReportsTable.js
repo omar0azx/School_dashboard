@@ -91,7 +91,7 @@ const ReportsTable = ({ searchQuery }) => {
           <tbody>
             {displayedOpportunities.length === 0 ? (
               <tr>
-                <td colSpan="7" className="text-center py-4">
+                <td colSpan="7" className="text-center py-5 font-semibold">
                   لا توجد فرص حالياً.
                 </td>
               </tr>

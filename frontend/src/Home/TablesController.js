@@ -6,11 +6,14 @@ import { FaSyncAlt } from "react-icons/fa"; // Import the refresh icon
 import MainTable from "./MainTable.js"; // Import MainTable
 import ReportsTable from "./ReportsTable"; //Import ReportsTable
 import DownloadIcon from "../assets/icon_download_file.svg";
+import Alert from "../components/Alert"; // Import the Alert component
 
 const TablesController = ({ searchQuery }) => {
   const [activeHeader, setActiveHeader] = useState("inbox");
   const [isRefreshing, setIsRefreshing] = useState(false); // Track loading state
   const [bounce, setBounce] = useState(false); // State for bounce animation
+  const [alertMessage, setAlertMessage] = useState(""); // State for the alert message
+  const [alertType, setAlertType] = useState(""); // State for the alert type
   const tableRef = useRef(null);
 
   const handleHeaderClick = (headerName) => {
@@ -26,13 +29,32 @@ const TablesController = ({ searchQuery }) => {
     }, 1500);
   };
 
-  // Function to handle Excel download
+  // Function to handle alert closing
+  const handleCloseAlert = () => {
+    setAlertMessage(""); // Clear the message when closing
+  };
+  const showAlert = (message, type) => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setTimeout(() => {
+      setAlertMessage("");
+    }, 5000); // Hide the alert after 5 seconds
+  };
+
+  // Function to handle Excel download with timeout for error message
   const handleDownloadExcel = () => {
     const tableData = tableRef.current.getTableData();
-    const worksheet = XLSX.utils.json_to_sheet(tableData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "MainTableData");
-    XLSX.writeFile(workbook, "Students_Data.xlsx");
+
+    if (tableData.length === 0) {
+      // If there's no data in the table, show an error alert and timeout before download
+      showAlert("لا توجد بيانات لتحميلها", "error");
+    } else {
+      // Proceed with Excel download if there is data
+      const worksheet = XLSX.utils.json_to_sheet(tableData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "MainTableData");
+      XLSX.writeFile(workbook, "Students_Data.xlsx");
+    }
   };
 
   // Refresh table function
@@ -142,6 +164,14 @@ const TablesController = ({ searchQuery }) => {
         <MainTable ref={tableRef} searchQuery={searchQuery} />
       )}
       {activeHeader === "reports" && <ReportsTable searchQuery={searchQuery} />}
+      {/* Show the alert */}
+      {alertMessage && (
+        <Alert
+          message={alertMessage}
+          type={alertType}
+          onClose={handleCloseAlert}
+        />
+      )}
     </div>
   );
 };
