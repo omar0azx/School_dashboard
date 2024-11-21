@@ -4,6 +4,7 @@ import Loader from "../components/Loader";
 import Alert from "../components/Alert";
 import { doc, updateDoc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import maleIcon from "../assets/avatar_male.svg";
+import femaleIcon from "../assets/avatar_female.svg";
 
 // Spinner Component
 const Spinner = () => (
@@ -184,7 +185,14 @@ const NewStudentsTable = ({ searchQuery }) => {
                   key={rowIndex}
                 >
                   <td className="py-3">
-                    <img src={maleIcon} alt="male student icon" />
+                    <img
+                      src={student.gender === "انثى" ? femaleIcon : maleIcon}
+                      alt={
+                        student.gender === "انثى"
+                          ? "female student icon"
+                          : "male student icon"
+                      }
+                    />{" "}
                   </td>
                   <td className="px-3 py-3">{student.name}</td>
                   <td className="px-3 py-3">{student.level}</td>
