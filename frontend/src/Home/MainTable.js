@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { db } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import maleIcon from "../assets/avatar_male.svg";
+import femaleIcon from "../assets/avatar_female.svg";
 import Loader from "../components/Loader"; // import the Loader component
 
 const MainTable = React.forwardRef(({ searchQuery }, ref) => {
@@ -154,7 +155,14 @@ const MainTable = React.forwardRef(({ searchQuery }, ref) => {
                   key={rowIndex}
                 >
                   <td className="py-3">
-                    <img src={maleIcon} alt="male student icon" />
+                    <img
+                      src={row.gender === "انثى" ? femaleIcon : maleIcon}
+                      alt={
+                        row.gender === "انثى"
+                          ? "female student icon"
+                          : "male student icon"
+                      }
+                    />{" "}
                   </td>
                   <td className="px-3 py-3">{row.name}</td>
                   <td className="px-3 py-3">{row.level}</td>

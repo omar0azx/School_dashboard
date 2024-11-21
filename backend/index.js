@@ -393,6 +393,7 @@ app.get("/opportunities", async (req, res) => {
         const opportunity = opportunitySnapshot.docs[0].data();
         opportunitiesData.push({
           studentName: student.name, // Ensure studentName is passed here
+          studentGender: student.gender,
           opportunityName: opportunity.name,
           hour: opportunity.hour,
           date: opportunity.date,

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import maleIcon from "../assets/avatar_male.svg";
+import femaleIcon from "../assets/avatar_female.svg";
 import Loader from "../components/Loader.js"; // Import the Loader component
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -90,7 +91,14 @@ const AllStudentsTable = ({ searchQuery }) => {
                   onClick={() => handleRowClick(student)}
                 >
                   <td className="py-3">
-                    <img src={maleIcon} alt="male student icon" />
+                    <img
+                      src={student.gender === "انثى" ? femaleIcon : maleIcon}
+                      alt={
+                        student.gender === "انثى"
+                          ? "female student icon"
+                          : "male student icon"
+                      }
+                    />{" "}
                   </td>
                   <td className="px-3 py-3">{student.name || "N/A"}</td>
                   <td className="px-3 py-3">{student.level || "N/A"}</td>
@@ -127,8 +135,12 @@ const AllStudentsTable = ({ searchQuery }) => {
             </button>
             <h3 className="text-4xl font-extrabold mb-8">تفاصيل الطالب</h3>
             <img
-              src={maleIcon}
-              alt="male student icon"
+              src={selectedStudent.gender === "انثى" ? femaleIcon : maleIcon}
+              alt={
+                selectedStudent.gender === "انثى"
+                  ? "female student icon"
+                  : "male student icon"
+              }
               className="w-20 h-20 mx-auto mb-4"
             />
 

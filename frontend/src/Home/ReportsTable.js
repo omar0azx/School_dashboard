@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import maleIcon from "../assets/avatar_male.svg";
+import femaleIcon from "../assets/avatar_female.svg";
 import { generateReport } from "../components/generateReport.js"; // Import report generator
 import Loader from "../components/Loader"; // Import a Loader component
 
@@ -102,7 +103,18 @@ const ReportsTable = ({ searchQuery }) => {
                   key={index}
                 >
                   <td className="py-3">
-                    <img src={maleIcon} alt="male student icon" />
+                    <img
+                      src={
+                        opportunity.studentGender === "انثى"
+                          ? femaleIcon
+                          : maleIcon
+                      }
+                      alt={
+                        opportunity.studentGender === "انثى"
+                          ? "female student icon"
+                          : "male student icon"
+                      }
+                    />{" "}
                   </td>
                   <td className="px-3 py-3">{opportunity.studentName}</td>
                   <td className="px-3 py-3">{opportunity.level}</td>

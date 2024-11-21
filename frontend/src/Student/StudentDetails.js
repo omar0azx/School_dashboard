@@ -4,6 +4,7 @@ import Loader from "../components/Loader";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa"; // Import back icon
 import maleIcon from "../assets/avatar_male.svg";
+import femaleIcon from "../assets/avatar_female.svg";
 import { useEffect, useState } from "react";
 import {
   collectionGroup,
@@ -208,7 +209,14 @@ function StudentContent({ student, navigate }) {
       {/* Student Name and Report Button */}
       <div className="flex justify-between items-center mt-4 mx-20">
         <div className="flex items-center mr-4">
-          <img src={maleIcon} alt="male student icon" />
+          <img
+            src={student.gender === "انثى" ? femaleIcon : maleIcon}
+            alt={
+              student.gender === "انثى"
+                ? "female student icon"
+                : "male student icon"
+            }
+          />{" "}
           <h2 className="text-2xl font-semibold mr-4">
             {student.name || "N/A"}
           </h2>
