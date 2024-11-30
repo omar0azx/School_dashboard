@@ -67,7 +67,7 @@ const Login = () => {
       }
 
       if (!emailFound) {
-        setError(".البريد الإلكتروني غير مصرح له بالدخول او غير صحيح");
+        setError("البريد الإلكتروني غير مصرح له بالدخول او غير صحيح");
         setLoading(false);
         return;
       }
